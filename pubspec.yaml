@@ -1,0 +1,52 @@
+name: ganabo
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.7.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.5.0
+  url_launcher: ^6.3.2
+  image_picker: ^1.2.0
+  path_provider: ^2.1.5
+  google_maps_flutter: ^2.12.3
+  shared_preferences: ^2.5.2
+  geocoding: ^4.0.0
+  geolocator: ^14.0.2
+  intl: ^0.20.2
+  pdf: ^3.11.1
+  open_file: ^3.5.10
+  
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "Icons/logo_inicio.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  web:
+    generate: true
+    image_path: "Icons/logo_inicio.png"
+    background_color: "#hexcode"
+    theme_color: "#hexcode"
+  windows:
+    generate: true
+    image_path: "Icons/logo_inicio.png"
+    icon_size: 48 # min:48, max:256, default: 48
+  macos:
+    generate: true
+    image_path: "Icons/logo_inicio.png"
+
+flutter:
+  uses-material-design: true
+  assets:
+    - Icons/
