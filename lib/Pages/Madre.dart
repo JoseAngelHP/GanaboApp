@@ -19,7 +19,8 @@ class _MadrePageState extends State<MadrePage> {
   final TextEditingController _fechaController = TextEditingController();
 
   // URL base de tu API
-  final String baseUrl = "http://192.168.1.43/api/madre.php";
+  //final String baseUrl = "http://192.168.1.43/api/madre.php";
+  final String baseUrl = "http://ganaboapp.infinityfreeapp.com/api/madre.php";
 
   // Lista para almacenar las madres
   List<dynamic> _madres = [];

@@ -25,7 +25,8 @@ class _PesajePageState extends State<PesajePage> {
   bool _buscando = false;
 
   // Servicio de API
-  static const String _baseUrl = 'http://192.168.1.43/api/pesaje.php';
+  //static const String _baseUrl = 'http://192.168.1.43/api/pesaje.php';
+  static const String _baseUrl = 'http://ganaboapp.infinityfreeapp.com/api/pesaje.php';
 
   static Map<String, String> get _headers => {
     'Content-Type': 'application/json',

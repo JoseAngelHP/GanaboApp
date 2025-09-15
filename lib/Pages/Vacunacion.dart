@@ -12,7 +12,8 @@ class VacunacionPage extends StatefulWidget {
 
 class _VacunacionPageState extends State<VacunacionPage> {
   // URL de tu API
-  final String apiUrl = "http://192.168.1.43/api/vacunacion.php";
+  //final String apiUrl = "http://192.168.1.43/api/vacunacion.php";
+  final String apiUrl = "http://ganaboapp.infinityfreeapp.com/api/vacunacion.php";
   
   // Controladores para los TextFields
   final TextEditingController _numeroAreteController = TextEditingController();

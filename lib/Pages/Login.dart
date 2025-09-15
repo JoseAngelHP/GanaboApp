@@ -16,8 +16,8 @@ class _LoginPageState extends State<LoginPage> {
   final correoController = TextEditingController();
   final contrasenaController = TextEditingController();
   bool isLoading = false;
-
-  Future<void> iniciarSesion() async {
+ 
+  Future<void> iniciarSesion() async { 
     // Validar campos
     if (correoController.text.isEmpty || contrasenaController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -30,7 +30,9 @@ class _LoginPageState extends State<LoginPage> {
       isLoading = true;
     });
 
-    final url = Uri.parse('http://192.168.1.43/api/login.php');
+    //final url = Uri.parse('http://192.168.1.43/api/login.php');
+    // URL CORRECTA para InfinityFree:
+    final url = Uri.parse('https://ganaboapp.infinityfreeapp.com/api/login.php');
     
     try {
       final response = await http.post(

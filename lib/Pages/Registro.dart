@@ -84,12 +84,14 @@ class _RegistroPageState extends State<RegistroPage> {
   // Animal seleccionado para modificar
   Animal? _animalSeleccionado;
   // URL de tu API
-  final String _apiUrl = "http://192.168.1.43/api/animales.php";
+  //final String _apiUrl = "http://192.168.1.43/api/animales.php";
+  final String _apiUrl = "http://ganaboapp.infinityfreeapp.com/api/animales.php";
 
   Future<void> _cargarRazasDesdeBD() async {
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.1.43/api/todos.php'),
+        //Uri.parse('http://192.168.1.43/api/todos.php'),
+        Uri.parse('http://ganaboapp.infinityfreeapp.com/api/todos.php'),
       );
 
       if (response.statusCode == 200) {

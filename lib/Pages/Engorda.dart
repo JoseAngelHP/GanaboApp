@@ -28,7 +28,8 @@ class _EngordaPageState extends State<EngordaPage> {
   final TextEditingController _pesoSalidaController = TextEditingController();
 
   int? _selectedIndex;
-  final String _apiUrl = 'http://192.168.1.43/api/engorda.php';
+  //final String _apiUrl = 'http://192.168.1.43/api/engorda.php';
+  final String _apiUrl = 'http://ganaboapp.infinityfreeapp.com/api/engorda.php';
 
   @override
   void initState() {

@@ -19,7 +19,8 @@ class _PadrePageState extends State<PadrePage> {
   final TextEditingController _fechaController = TextEditingController();
 
   // URL base de tu API
-  final String baseUrl = "http://192.168.1.43/api/padre.php";
+  //final String baseUrl = "http://192.168.1.43/api/padre.php";
+  final String baseUrl = "http://ganaboapp.infinityfreeapp.com/api/padre.php";
 
   // Función para mostrar mensajes
   void _mostrarMensaje(String mensaje) {

@@ -19,7 +19,8 @@ class _RazaPageState extends State<RazaPage> {
   final TextEditingController _alturaController = TextEditingController();
 
   // URL de la API
-  final String _apiUrl = "http://192.168.1.43/api/raza.php";
+  //final String _apiUrl = "http://192.168.1.43/api/raza.php";
+  final String _apiUrl = "http://ganaboapp.infinityfreeapp.com/api/raza.php";
 
   // Lista para almacenar las razas
   List<dynamic> _razas = [];

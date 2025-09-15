@@ -17,7 +17,8 @@ class _OrigenPageState extends State<OrigenPage> {
   final TextEditingController _colorGanadoController = TextEditingController();
 
   // URL de la API
-  final String _apiUrl = "http://192.168.1.43/api/origen.php";
+  //final String _apiUrl = "http://192.168.1.43/api/origen.php";
+  final String _apiUrl = "http://ganaboapp.infinityfreeapp.com/api/origen.php";
 
   // Lista para almacenar los orígenes
   List<dynamic> _origenes = [];
