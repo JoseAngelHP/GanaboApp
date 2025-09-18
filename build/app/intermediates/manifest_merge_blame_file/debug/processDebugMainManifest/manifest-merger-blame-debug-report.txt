@@ -32,25 +32,25 @@
 24         In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin.
 25    -->
 26    <queries>
-26-->C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:44:5-53:15
+26-->C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:45:5-54:15
 27        <intent>
-27-->C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:45:9-48:18
+27-->C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:46:9-49:18
 28            <action android:name="android.intent.action.PROCESS_TEXT" />
-28-->C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:46:13-72
-28-->C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:46:21-70
+28-->C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:47:13-72
+28-->C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:47:21-70
 29
 30            <data android:mimeType="text/plain" />
-30-->C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:47:13-50
-30-->C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:47:19-48
+30-->C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:48:13-50
+30-->C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:48:19-48
 31        </intent>
 32        <intent>
-32-->C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:49:9-52:18
+32-->C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:50:9-53:18
 33            <action android:name="android.intent.action.VIEW" />
-33-->C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:50:13-65
-33-->C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:50:21-62
+33-->C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:51:13-65
+33-->C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:51:21-62
 34
 35            <data android:scheme="https" />
-35-->C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:47:13-50
+35-->C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:48:13-50
 36        </intent>
 37        <!-- Needs to be explicitly declared on Android R+ -->
 38        <package android:name="com.google.android.apps.maps" />
@@ -87,221 +87,222 @@
 56        android:extractNativeLibs="true"
 57        android:icon="@mipmap/launcher_icon"
 58        android:label="ganabo"
-59        android:usesCleartextTraffic="true" >
-60        <activity
-61            android:name="com.example.ganabo.MainActivity"
-62            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
-63            android:exported="true"
-64            android:hardwareAccelerated="true"
-65            android:launchMode="singleTop"
-66            android:taskAffinity=""
-67            android:theme="@style/LaunchTheme"
-68            android:windowSoftInputMode="adjustResize" >
-69
-70            <!--
-71                 Specifies an Android theme to apply to this Activity as soon as
-72                 the Android process has started. This theme is visible to the user
-73                 while the Flutter UI initializes. After that, this theme continues
-74                 to determine the Window background behind the Flutter UI.
-75            -->
-76            <meta-data
-77                android:name="io.flutter.embedding.android.NormalTheme"
-78                android:resource="@style/NormalTheme" />
-79
-80            <intent-filter>
-81                <action android:name="android.intent.action.MAIN" />
-82
-83                <category android:name="android.intent.category.LAUNCHER" />
-84            </intent-filter>
-85        </activity>
-86        <!--
-87             Don't delete the meta-data below.
-88             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java
-89        -->
-90        <meta-data
-91            android:name="flutterEmbedding"
-92            android:value="2" />
-93
-94        <service
-94-->[:geolocator_android] C:\xampp\htdocs\GanaboApp\build\geolocator_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-12:56
-95            android:name="com.baseflow.geolocator.GeolocatorLocationService"
-95-->[:geolocator_android] C:\xampp\htdocs\GanaboApp\build\geolocator_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:13-77
-96            android:enabled="true"
-96-->[:geolocator_android] C:\xampp\htdocs\GanaboApp\build\geolocator_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:13-35
-97            android:exported="false"
-97-->[:geolocator_android] C:\xampp\htdocs\GanaboApp\build\geolocator_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-37
-98            android:foregroundServiceType="location" />
-98-->[:geolocator_android] C:\xampp\htdocs\GanaboApp\build\geolocator_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:13-53
-99
-100        <provider
-100-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:9-17:20
-101            android:name="io.flutter.plugins.imagepicker.ImagePickerFileProvider"
-101-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:13-82
-102            android:authorities="com.example.ganabo.flutter.image_provider"
-102-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-74
-103            android:exported="false"
-103-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:13-37
-104            android:grantUriPermissions="true" >
-104-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:13-47
-105            <meta-data
-105-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:13-16:75
-106                android:name="android.support.FILE_PROVIDER_PATHS"
-106-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:17-67
-107                android:resource="@xml/flutter_image_picker_file_paths" />
-107-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:16:17-72
-108        </provider> <!-- Trigger Google Play services to install the backported photo picker module. -->
-109        <service
-109-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:19:9-31:19
-110            android:name="com.google.android.gms.metadata.ModuleDependencies"
-110-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:20:13-78
-111            android:enabled="false"
-111-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:21:13-36
-112            android:exported="false" >
-112-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:22:13-37
-113            <intent-filter>
-113-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:24:13-26:29
-114                <action android:name="com.google.android.gms.metadata.MODULE_DEPENDENCIES" />
-114-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:25:17-94
-114-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:25:25-91
-115            </intent-filter>
-116
-117            <meta-data
-117-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:28:13-30:36
-118                android:name="photopicker_activity:0:required"
-118-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:29:17-63
-119                android:value="" />
-119-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:30:17-33
-120        </service>
-121
-122        <provider
-122-->[:open_file_android] C:\xampp\htdocs\GanaboApp\build\open_file_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:9-19:20
-123            android:name="com.crazecoder.openfile.FileProvider"
-123-->[:open_file_android] C:\xampp\htdocs\GanaboApp\build\open_file_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:13-64
-124            android:authorities="com.example.ganabo.fileProvider.com.crazecoder.openfile"
-124-->[:open_file_android] C:\xampp\htdocs\GanaboApp\build\open_file_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-88
-125            android:exported="false"
-125-->[:open_file_android] C:\xampp\htdocs\GanaboApp\build\open_file_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:13-37
-126            android:grantUriPermissions="true"
-126-->[:open_file_android] C:\xampp\htdocs\GanaboApp\build\open_file_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:13-47
-127            android:requestLegacyExternalStorage="true" >
-127-->[:open_file_android] C:\xampp\htdocs\GanaboApp\build\open_file_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:13-56
-128            <meta-data
-128-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:13-16:75
-129                android:name="android.support.FILE_PROVIDER_PATHS"
-129-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:17-67
-130                android:resource="@xml/filepaths" />
-130-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:16:17-72
-131        </provider>
-132
-133        <activity
-133-->[:url_launcher_android] C:\xampp\htdocs\GanaboApp\build\url_launcher_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-11:74
-134            android:name="io.flutter.plugins.urllauncher.WebViewActivity"
-134-->[:url_launcher_android] C:\xampp\htdocs\GanaboApp\build\url_launcher_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:13-74
-135            android:exported="false"
-135-->[:url_launcher_android] C:\xampp\htdocs\GanaboApp\build\url_launcher_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:13-37
-136            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" /> <!-- Needs to be explicitly declared on P+ -->
-136-->[:url_launcher_android] C:\xampp\htdocs\GanaboApp\build\url_launcher_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-71
-137        <uses-library
-137-->[com.google.android.gms:play-services-maps:19.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\0af2163ca8a254cebc342e25b97d766e\transformed\jetified-play-services-maps-19.2.0\AndroidManifest.xml:33:7-86
-138            android:name="org.apache.http.legacy"
-138-->[com.google.android.gms:play-services-maps:19.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\0af2163ca8a254cebc342e25b97d766e\transformed\jetified-play-services-maps-19.2.0\AndroidManifest.xml:33:21-58
-139            android:required="false" />
-139-->[com.google.android.gms:play-services-maps:19.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\0af2163ca8a254cebc342e25b97d766e\transformed\jetified-play-services-maps-19.2.0\AndroidManifest.xml:33:59-83
-140
-141        <activity
-141-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\c26a5e61fe542527cf2bb32b2ba51b51\transformed\jetified-play-services-base-18.5.0\AndroidManifest.xml:5:9-173
-142            android:name="com.google.android.gms.common.api.GoogleApiActivity"
-142-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\c26a5e61fe542527cf2bb32b2ba51b51\transformed\jetified-play-services-base-18.5.0\AndroidManifest.xml:5:19-85
-143            android:exported="false"
-143-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\c26a5e61fe542527cf2bb32b2ba51b51\transformed\jetified-play-services-base-18.5.0\AndroidManifest.xml:5:146-170
-144            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-144-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\c26a5e61fe542527cf2bb32b2ba51b51\transformed\jetified-play-services-base-18.5.0\AndroidManifest.xml:5:86-145
-145
-146        <meta-data
-146-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\daa46f0fdd16f05f69205eaa668178c9\transformed\jetified-play-services-basement-18.4.0\AndroidManifest.xml:6:9-122
-147            android:name="com.google.android.gms.version"
-147-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\daa46f0fdd16f05f69205eaa668178c9\transformed\jetified-play-services-basement-18.4.0\AndroidManifest.xml:6:20-65
-148            android:value="@integer/google_play_services_version" />
-148-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\daa46f0fdd16f05f69205eaa668178c9\transformed\jetified-play-services-basement-18.4.0\AndroidManifest.xml:6:66-119
-149
-150        <uses-library
-150-->[androidx.window:window:1.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\aed2861b2b6894f7067df3f3f96b791f\transformed\jetified-window-1.2.0\AndroidManifest.xml:23:9-25:40
-151            android:name="androidx.window.extensions"
-151-->[androidx.window:window:1.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\aed2861b2b6894f7067df3f3f96b791f\transformed\jetified-window-1.2.0\AndroidManifest.xml:24:13-54
-152            android:required="false" />
-152-->[androidx.window:window:1.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\aed2861b2b6894f7067df3f3f96b791f\transformed\jetified-window-1.2.0\AndroidManifest.xml:25:13-37
-153        <uses-library
-153-->[androidx.window:window:1.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\aed2861b2b6894f7067df3f3f96b791f\transformed\jetified-window-1.2.0\AndroidManifest.xml:26:9-28:40
-154            android:name="androidx.window.sidecar"
-154-->[androidx.window:window:1.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\aed2861b2b6894f7067df3f3f96b791f\transformed\jetified-window-1.2.0\AndroidManifest.xml:27:13-51
-155            android:required="false" />
-155-->[androidx.window:window:1.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\aed2861b2b6894f7067df3f3f96b791f\transformed\jetified-window-1.2.0\AndroidManifest.xml:28:13-37
-156
-157        <provider
-157-->[androidx.emoji2:emoji2:1.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\2572c773145932f08e3b72fd0d530e61\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:24:9-32:20
-158            android:name="androidx.startup.InitializationProvider"
-158-->[androidx.emoji2:emoji2:1.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\2572c773145932f08e3b72fd0d530e61\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:25:13-67
-159            android:authorities="com.example.ganabo.androidx-startup"
-159-->[androidx.emoji2:emoji2:1.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\2572c773145932f08e3b72fd0d530e61\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:26:13-68
-160            android:exported="false" >
-160-->[androidx.emoji2:emoji2:1.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\2572c773145932f08e3b72fd0d530e61\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:27:13-37
-161            <meta-data
-161-->[androidx.emoji2:emoji2:1.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\2572c773145932f08e3b72fd0d530e61\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:29:13-31:52
-162                android:name="androidx.emoji2.text.EmojiCompatInitializer"
-162-->[androidx.emoji2:emoji2:1.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\2572c773145932f08e3b72fd0d530e61\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:30:17-75
-163                android:value="androidx.startup" />
-163-->[androidx.emoji2:emoji2:1.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\2572c773145932f08e3b72fd0d530e61\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:31:17-49
-164            <meta-data
-164-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\bb10008c4b33ee9597583412a41828ed\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:29:13-31:52
-165                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
-165-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\bb10008c4b33ee9597583412a41828ed\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:30:17-78
-166                android:value="androidx.startup" />
-166-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\bb10008c4b33ee9597583412a41828ed\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:31:17-49
-167            <meta-data
-167-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:29:13-31:52
-168                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
-168-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:30:17-85
-169                android:value="androidx.startup" />
-169-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:31:17-49
-170        </provider>
-171
-172        <receiver
-172-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:34:9-52:20
-173            android:name="androidx.profileinstaller.ProfileInstallReceiver"
-173-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:35:13-76
-174            android:directBootAware="false"
-174-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:36:13-44
-175            android:enabled="true"
-175-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:37:13-35
-176            android:exported="true"
-176-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:38:13-36
-177            android:permission="android.permission.DUMP" >
-177-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:39:13-57
-178            <intent-filter>
-178-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:40:13-42:29
-179                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
-179-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:41:17-91
-179-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:41:25-88
-180            </intent-filter>
-181            <intent-filter>
-181-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:43:13-45:29
-182                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
-182-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:44:17-85
-182-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:44:25-82
-183            </intent-filter>
-184            <intent-filter>
-184-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:46:13-48:29
-185                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
-185-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:47:17-88
-185-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:47:25-85
-186            </intent-filter>
-187            <intent-filter>
-187-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:49:13-51:29
-188                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
-188-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:50:17-95
-188-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:50:25-92
-189            </intent-filter>
-190        </receiver>
-191    </application>
-192
-193</manifest>
+59        android:networkSecurityConfig="@xml/network_security_config"
+60        android:usesCleartextTraffic="true" >
+61        <activity
+62            android:name="com.example.ganabo.MainActivity"
+63            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+64            android:exported="true"
+65            android:hardwareAccelerated="true"
+66            android:launchMode="singleTop"
+67            android:taskAffinity=""
+68            android:theme="@style/LaunchTheme"
+69            android:windowSoftInputMode="adjustResize" >
+70
+71            <!--
+72                 Specifies an Android theme to apply to this Activity as soon as
+73                 the Android process has started. This theme is visible to the user
+74                 while the Flutter UI initializes. After that, this theme continues
+75                 to determine the Window background behind the Flutter UI.
+76            -->
+77            <meta-data
+78                android:name="io.flutter.embedding.android.NormalTheme"
+79                android:resource="@style/NormalTheme" />
+80
+81            <intent-filter>
+82                <action android:name="android.intent.action.MAIN" />
+83
+84                <category android:name="android.intent.category.LAUNCHER" />
+85            </intent-filter>
+86        </activity>
+87        <!--
+88             Don't delete the meta-data below.
+89             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java
+90        -->
+91        <meta-data
+92            android:name="flutterEmbedding"
+93            android:value="2" />
+94
+95        <service
+95-->[:geolocator_android] C:\xampp\htdocs\GanaboApp\build\geolocator_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-12:56
+96            android:name="com.baseflow.geolocator.GeolocatorLocationService"
+96-->[:geolocator_android] C:\xampp\htdocs\GanaboApp\build\geolocator_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:13-77
+97            android:enabled="true"
+97-->[:geolocator_android] C:\xampp\htdocs\GanaboApp\build\geolocator_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:13-35
+98            android:exported="false"
+98-->[:geolocator_android] C:\xampp\htdocs\GanaboApp\build\geolocator_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-37
+99            android:foregroundServiceType="location" />
+99-->[:geolocator_android] C:\xampp\htdocs\GanaboApp\build\geolocator_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:13-53
+100
+101        <provider
+101-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:9-17:20
+102            android:name="io.flutter.plugins.imagepicker.ImagePickerFileProvider"
+102-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:13-82
+103            android:authorities="com.example.ganabo.flutter.image_provider"
+103-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-74
+104            android:exported="false"
+104-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:13-37
+105            android:grantUriPermissions="true" >
+105-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:13-47
+106            <meta-data
+106-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:13-16:75
+107                android:name="android.support.FILE_PROVIDER_PATHS"
+107-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:17-67
+108                android:resource="@xml/flutter_image_picker_file_paths" />
+108-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:16:17-72
+109        </provider> <!-- Trigger Google Play services to install the backported photo picker module. -->
+110        <service
+110-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:19:9-31:19
+111            android:name="com.google.android.gms.metadata.ModuleDependencies"
+111-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:20:13-78
+112            android:enabled="false"
+112-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:21:13-36
+113            android:exported="false" >
+113-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:22:13-37
+114            <intent-filter>
+114-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:24:13-26:29
+115                <action android:name="com.google.android.gms.metadata.MODULE_DEPENDENCIES" />
+115-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:25:17-94
+115-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:25:25-91
+116            </intent-filter>
+117
+118            <meta-data
+118-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:28:13-30:36
+119                android:name="photopicker_activity:0:required"
+119-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:29:17-63
+120                android:value="" />
+120-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:30:17-33
+121        </service>
+122
+123        <provider
+123-->[:open_file_android] C:\xampp\htdocs\GanaboApp\build\open_file_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:9-19:20
+124            android:name="com.crazecoder.openfile.FileProvider"
+124-->[:open_file_android] C:\xampp\htdocs\GanaboApp\build\open_file_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:13-64
+125            android:authorities="com.example.ganabo.fileProvider.com.crazecoder.openfile"
+125-->[:open_file_android] C:\xampp\htdocs\GanaboApp\build\open_file_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-88
+126            android:exported="false"
+126-->[:open_file_android] C:\xampp\htdocs\GanaboApp\build\open_file_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:13-37
+127            android:grantUriPermissions="true"
+127-->[:open_file_android] C:\xampp\htdocs\GanaboApp\build\open_file_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:13-47
+128            android:requestLegacyExternalStorage="true" >
+128-->[:open_file_android] C:\xampp\htdocs\GanaboApp\build\open_file_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:13-56
+129            <meta-data
+129-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:13-16:75
+130                android:name="android.support.FILE_PROVIDER_PATHS"
+130-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:17-67
+131                android:resource="@xml/filepaths" />
+131-->[:image_picker_android] C:\xampp\htdocs\GanaboApp\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:16:17-72
+132        </provider>
+133
+134        <activity
+134-->[:url_launcher_android] C:\xampp\htdocs\GanaboApp\build\url_launcher_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-11:74
+135            android:name="io.flutter.plugins.urllauncher.WebViewActivity"
+135-->[:url_launcher_android] C:\xampp\htdocs\GanaboApp\build\url_launcher_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:13-74
+136            android:exported="false"
+136-->[:url_launcher_android] C:\xampp\htdocs\GanaboApp\build\url_launcher_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:13-37
+137            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" /> <!-- Needs to be explicitly declared on P+ -->
+137-->[:url_launcher_android] C:\xampp\htdocs\GanaboApp\build\url_launcher_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-71
+138        <uses-library
+138-->[com.google.android.gms:play-services-maps:19.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\0af2163ca8a254cebc342e25b97d766e\transformed\jetified-play-services-maps-19.2.0\AndroidManifest.xml:33:7-86
+139            android:name="org.apache.http.legacy"
+139-->[com.google.android.gms:play-services-maps:19.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\0af2163ca8a254cebc342e25b97d766e\transformed\jetified-play-services-maps-19.2.0\AndroidManifest.xml:33:21-58
+140            android:required="false" />
+140-->[com.google.android.gms:play-services-maps:19.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\0af2163ca8a254cebc342e25b97d766e\transformed\jetified-play-services-maps-19.2.0\AndroidManifest.xml:33:59-83
+141
+142        <activity
+142-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\c26a5e61fe542527cf2bb32b2ba51b51\transformed\jetified-play-services-base-18.5.0\AndroidManifest.xml:5:9-173
+143            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+143-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\c26a5e61fe542527cf2bb32b2ba51b51\transformed\jetified-play-services-base-18.5.0\AndroidManifest.xml:5:19-85
+144            android:exported="false"
+144-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\c26a5e61fe542527cf2bb32b2ba51b51\transformed\jetified-play-services-base-18.5.0\AndroidManifest.xml:5:146-170
+145            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+145-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\c26a5e61fe542527cf2bb32b2ba51b51\transformed\jetified-play-services-base-18.5.0\AndroidManifest.xml:5:86-145
+146
+147        <meta-data
+147-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\daa46f0fdd16f05f69205eaa668178c9\transformed\jetified-play-services-basement-18.4.0\AndroidManifest.xml:6:9-122
+148            android:name="com.google.android.gms.version"
+148-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\daa46f0fdd16f05f69205eaa668178c9\transformed\jetified-play-services-basement-18.4.0\AndroidManifest.xml:6:20-65
+149            android:value="@integer/google_play_services_version" />
+149-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\daa46f0fdd16f05f69205eaa668178c9\transformed\jetified-play-services-basement-18.4.0\AndroidManifest.xml:6:66-119
+150
+151        <uses-library
+151-->[androidx.window:window:1.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\aed2861b2b6894f7067df3f3f96b791f\transformed\jetified-window-1.2.0\AndroidManifest.xml:23:9-25:40
+152            android:name="androidx.window.extensions"
+152-->[androidx.window:window:1.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\aed2861b2b6894f7067df3f3f96b791f\transformed\jetified-window-1.2.0\AndroidManifest.xml:24:13-54
+153            android:required="false" />
+153-->[androidx.window:window:1.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\aed2861b2b6894f7067df3f3f96b791f\transformed\jetified-window-1.2.0\AndroidManifest.xml:25:13-37
+154        <uses-library
+154-->[androidx.window:window:1.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\aed2861b2b6894f7067df3f3f96b791f\transformed\jetified-window-1.2.0\AndroidManifest.xml:26:9-28:40
+155            android:name="androidx.window.sidecar"
+155-->[androidx.window:window:1.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\aed2861b2b6894f7067df3f3f96b791f\transformed\jetified-window-1.2.0\AndroidManifest.xml:27:13-51
+156            android:required="false" />
+156-->[androidx.window:window:1.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\aed2861b2b6894f7067df3f3f96b791f\transformed\jetified-window-1.2.0\AndroidManifest.xml:28:13-37
+157
+158        <provider
+158-->[androidx.emoji2:emoji2:1.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\2572c773145932f08e3b72fd0d530e61\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:24:9-32:20
+159            android:name="androidx.startup.InitializationProvider"
+159-->[androidx.emoji2:emoji2:1.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\2572c773145932f08e3b72fd0d530e61\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:25:13-67
+160            android:authorities="com.example.ganabo.androidx-startup"
+160-->[androidx.emoji2:emoji2:1.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\2572c773145932f08e3b72fd0d530e61\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:26:13-68
+161            android:exported="false" >
+161-->[androidx.emoji2:emoji2:1.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\2572c773145932f08e3b72fd0d530e61\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:27:13-37
+162            <meta-data
+162-->[androidx.emoji2:emoji2:1.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\2572c773145932f08e3b72fd0d530e61\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:29:13-31:52
+163                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+163-->[androidx.emoji2:emoji2:1.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\2572c773145932f08e3b72fd0d530e61\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:30:17-75
+164                android:value="androidx.startup" />
+164-->[androidx.emoji2:emoji2:1.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\2572c773145932f08e3b72fd0d530e61\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:31:17-49
+165            <meta-data
+165-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\bb10008c4b33ee9597583412a41828ed\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:29:13-31:52
+166                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+166-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\bb10008c4b33ee9597583412a41828ed\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:30:17-78
+167                android:value="androidx.startup" />
+167-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\bb10008c4b33ee9597583412a41828ed\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:31:17-49
+168            <meta-data
+168-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:29:13-31:52
+169                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+169-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:30:17-85
+170                android:value="androidx.startup" />
+170-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:31:17-49
+171        </provider>
+172
+173        <receiver
+173-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:34:9-52:20
+174            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+174-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:35:13-76
+175            android:directBootAware="false"
+175-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:36:13-44
+176            android:enabled="true"
+176-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:37:13-35
+177            android:exported="true"
+177-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:38:13-36
+178            android:permission="android.permission.DUMP" >
+178-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:39:13-57
+179            <intent-filter>
+179-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:40:13-42:29
+180                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+180-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:41:17-91
+180-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:41:25-88
+181            </intent-filter>
+182            <intent-filter>
+182-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:43:13-45:29
+183                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+183-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:44:17-85
+183-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:44:25-82
+184            </intent-filter>
+185            <intent-filter>
+185-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:46:13-48:29
+186                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+186-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:47:17-88
+186-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:47:25-85
+187            </intent-filter>
+188            <intent-filter>
+188-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:49:13-51:29
+189                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+189-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:50:17-95
+189-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\53e65cb99d6b4f80573625ff2ea53dae\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:50:25-92
+190            </intent-filter>
+191        </receiver>
+192    </application>
+193
+194</manifest>

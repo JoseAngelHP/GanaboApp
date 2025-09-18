@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart'; // ← AÑADE ESTA IMPORTACIÓN
 import 'package:ganabo/Widgets/Header.dart';
 import 'package:ganabo/Widgets/Logo.dart';
 import 'package:ganabo/Widgets/TextFieldCustom.dart';
@@ -10,6 +11,18 @@ class LoginPage extends StatefulWidget {
 
   @override
   State<LoginPage> createState() => _LoginPageState();
+}
+
+// ← AÑADE ESTA FUNCIÓN FUERA DE LA CLASE
+String getApiUrl(String endpoint) {
+  // Para WEB: Usar HTTPS con Vercel
+  if (kIsWeb) {
+    return 'https://ganaboapp.vercel.app/api/proxy?action=$endpoint';
+  }
+  // Para MÓVIL: Usar HTTP directo
+  else {
+    return 'http://ganabovino.atwebpages.com/api/$endpoint.php';
+  }
 }
 
 class _LoginPageState extends State<LoginPage> {
@@ -30,10 +43,12 @@ class _LoginPageState extends State<LoginPage> {
       isLoading = true;
     });
 
-    //final url = Uri.parse('http://192.168.1.43/api/login.php');
-    // URL CORRECTA para InfinityFree:
-    final url = Uri.parse('http://ganabovino.atwebpages.com/api/login.php');
+    // ← URL DINÁMICA QUE FUNCIONA EN WEB Y MÓVIL
+    final url = Uri.parse(getApiUrl('login'));
     
+    print('🌐 URL usada: $url'); // ← PARA DEBUG
+    print('📱 Plataforma: ${kIsWeb ? 'WEB' : 'MÓVIL'}'); // ← PARA DEBUG
+
     try {
       final response = await http.post(
         url,
@@ -47,8 +62,8 @@ class _LoginPageState extends State<LoginPage> {
         }),
       );
 
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
+      print('✅ Response status: ${response.statusCode}');
+      print('✅ Response body: ${response.body}');
 
       final responseData = jsonDecode(response.body);
       
@@ -78,7 +93,7 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } catch (e) {
-      print('Error completo: $e');
+      print('❌ Error completo: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error de conexión: ${e.toString()}'))
       );
@@ -165,7 +180,6 @@ class _ForgotPassword extends StatelessWidget {
       alignment: Alignment.centerRight,
       child: TextButton(
         onPressed: () {
-          // Aquí puedes agregar la funcionalidad de "Olvidé mi contraseña"
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Funcionalidad de recuperación de contraseña')),
           );
