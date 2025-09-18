@@ -32,7 +32,7 @@ class _LoginPageState extends State<LoginPage> {
 
     //final url = Uri.parse('http://192.168.1.43/api/login.php');
     // URL CORRECTA para InfinityFree:
-    final url = Uri.parse('https://ganaboapp.infinityfreeapp.com/api/login.php');
+    final url = Uri.parse('http://ganabovino.atwebpages.com/api/login.php');
     
     try {
       final response = await http.post(

@@ -20,7 +20,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Future<void> registrarUsuario() async {
   //final url = Uri.parse('http://192.168.1.43/api/registro.php');
-  final url = Uri.parse('http://ganaboapp.infinityfreeapp.com/api/registro.php');
+  final url = Uri.parse('http://ganabovino.atwebpages.com/api/registro.php');
   
   try {
     final response = await http.post(

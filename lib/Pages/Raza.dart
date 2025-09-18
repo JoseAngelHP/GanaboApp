@@ -20,7 +20,7 @@ class _RazaPageState extends State<RazaPage> {
 
   // URL de la API
   //final String _apiUrl = "http://192.168.1.43/api/raza.php";
-  final String _apiUrl = "http://ganaboapp.infinityfreeapp.com/api/raza.php";
+  final String _apiUrl = "http://ganabovino.atwebpages.com/api/raza.php";
 
   // Lista para almacenar las razas
   List<dynamic> _razas = [];

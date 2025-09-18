@@ -29,7 +29,7 @@ class _EngordaPageState extends State<EngordaPage> {
 
   int? _selectedIndex;
   //final String _apiUrl = 'http://192.168.1.43/api/engorda.php';
-  final String _apiUrl = 'http://ganaboapp.infinityfreeapp.com/api/engorda.php';
+  final String _apiUrl = 'http://ganabovino.atwebpages.com/api/engorda.php';
 
   @override
   void initState() {

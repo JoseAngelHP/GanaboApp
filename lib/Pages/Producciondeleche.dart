@@ -26,7 +26,7 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
 
   // Configuración de la API - URL COMPLETA
   //static const String baseUrl = 'http://192.168.1.43/api/produccion.php';
-  static const String baseUrl = 'http://ganaboapp.infinityfreeapp.com/api/produccion.php';
+  static const String baseUrl = 'http://ganabovino.atwebpages.com/api/produccion.php';
   static const Map<String, String> headers = {
     'Content-Type': 'application/json',
   };
