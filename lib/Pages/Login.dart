@@ -17,7 +17,7 @@ class LoginPage extends StatefulWidget {
 String getApiUrl(String endpoint) {
   // Para WEB: Usar HTTPS con Vercel
   if (kIsWeb) {
-    return 'https://ganaboapp.vercel.app/api/proxy?action=$endpoint';
+    return 'https://ganaboapp.vercel.app/server/proxy?action=$endpoint';
   }
   // Para MÓVIL: Usar HTTP directo
   else {
