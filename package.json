@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@vercel/node": "^4.0.0"
+  }
+}
