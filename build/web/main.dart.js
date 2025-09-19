@@ -88722,7 +88722,7 @@ s=p}while(true)switch(s){case 0:e=m.d
 if(e.a.a.length===0||m.e.a.a.length===0){m.c.D(t.q).f.a4(B.a8(null,null,null,null,null,A.D,null,B.A("Por favor, complete todos los campos",null,null,null,null,null,null,null),null,A.K,null,null,null,null,null,null,null,null,null))
 s=1
 break}m.P(new B.arb(m))
-l=B.b3("https://ganaboapp.vercel.app/server/proxy?action=login",0,null)
+l=B.b3("https://ganaboapp.vercel.app/api/proxy?action=login",0,null)
 B.cs("\ud83c\udf10 URL usada: "+B.i(l))
 B.cs("\ud83d\udcf1 Plataforma: WEB")
 p=4
