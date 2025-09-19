@@ -1,10 +1,9 @@
 export default async function handler(req, res) {
-  // ¡AGREGA ESTOS HEADERS CORS!
+  // Headers CORS esenciales
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   
-  // Manejar preflight requests (OPTIONS)
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
@@ -12,7 +11,6 @@ export default async function handler(req, res) {
   try {
     const { action } = req.query;
     
-    // Validar que venga el action
     if (!action) {
       return res.status(400).json({ error: 'Parámetro action requerido' });
     }
@@ -31,7 +29,6 @@ export default async function handler(req, res) {
     res.status(response.status).send(data);
 
   } catch (error) {
-    console.error('Error en proxy:', error);
-    res.status(500).json({ error: 'Error en el proxy', message: error.message });
+    res.status(500).json({ error: error.message });
   }
 }
