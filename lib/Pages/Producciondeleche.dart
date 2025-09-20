@@ -2,6 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:ganabo/Pages/Pdf_Serviced.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter/foundation.dart'; // ← AÑADE ESTA IMPORTACIÓN
+
+// ← AÑADE ESTA FUNCIÓN FUERA DE LA CLASE
+String getApiUrl(String endpoint) {
+  // Para WEB: Usar HTTPS
+  if (kIsWeb) {
+    return 'https://ganabovino.atwebpages.com/api/$endpoint.php';
+  }
+  // Para MÓVIL: Usar HTTP
+  else {
+    return 'http://ganabovino.atwebpages.com/api/$endpoint.php';
+  }
+}
 
 class ProducciondelechePage extends StatefulWidget {
   const ProducciondelechePage({Key? key}) : super(key: key);
@@ -24,9 +37,7 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
   // ignore: unused_field
   bool _generandoPDF = false;
 
-  // Configuración de la API - URL COMPLETA
-  //static const String baseUrl = 'http://192.168.1.43/api/produccion.php';
-  static const String baseUrl = 'http://ganabovino.atwebpages.com/api/produccion.php';
+  // Headers para las peticiones HTTP
   static const Map<String, String> headers = {
     'Content-Type': 'application/json',
   };
@@ -73,8 +84,9 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
           'observaciones': _observacionesController.text,
         };
 
+        final url = Uri.parse(getApiUrl('produccion'));
         final response = await http.post(
-          Uri.parse(baseUrl), // SOLO baseUrl, sin endpoint
+          url,
           headers: headers,
           body: json.encode(registro),
         );
@@ -117,10 +129,8 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
     });
 
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl?numero_arete=${_numeroAreteController.text}'),
-        headers: headers,
-      );
+      final url = Uri.parse("${getApiUrl('produccion')}?numero_arete=${_numeroAreteController.text}");
+      final response = await http.get(url, headers: headers);
 
       if (!mounted) return;
 
@@ -204,8 +214,9 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
           'observaciones': _observacionesController.text,
         };
 
+        final url = Uri.parse(getApiUrl('produccion'));
         final response = await http.put(
-          Uri.parse(baseUrl), // SOLO baseUrl
+          url,
           headers: headers,
           body: json.encode(registro),
         );
@@ -268,8 +279,9 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
                       'fecha_ordeño': _convertirFecha(_fechaController.text),
                     };
 
+                    final url = Uri.parse(getApiUrl('produccion'));
                     final response = await http.delete(
-                      Uri.parse(baseUrl),
+                      url,
                       headers: headers,
                       body: json.encode(data),
                     );
@@ -322,7 +334,8 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
   void _verLista() async {
     try {
       // Obtener todos los registros
-      final response = await http.get(Uri.parse(baseUrl), headers: headers);
+      final url = Uri.parse(getApiUrl('produccion'));
+      final response = await http.get(url, headers: headers);
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
@@ -593,7 +606,8 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
 
     try {
       // Obtener todos los registros
-      final response = await http.get(Uri.parse(baseUrl), headers: headers);
+      final url = Uri.parse(getApiUrl('produccion'));
+      final response = await http.get(url, headers: headers);
 
       if (response.statusCode == 200) {
         final List<dynamic> registros = json.decode(response.body);

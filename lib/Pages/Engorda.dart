@@ -1,8 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+import 'package:flutter/foundation.dart'; // ← AÑADE ESTA IMPORTACIÓN
 import 'package:intl/intl.dart';
+
+// ← AÑADE ESTA FUNCIÓN FUERA DE LA CLASE
+String getApiUrl(String endpoint) {
+  // Para WEB: Usar HTTPS
+  if (kIsWeb) {
+    return 'https://ganabovino.atwebpages.com/api/$endpoint.php';
+  }
+  // Para MÓVIL: Usar HTTP
+  else {
+    return 'http://ganabovino.atwebpages.com/api/$endpoint.php';
+  }
+}
 
 class EngordaPage extends StatefulWidget {
   const EngordaPage({Key? key}) : super(key: key);
@@ -28,8 +40,6 @@ class _EngordaPageState extends State<EngordaPage> {
   final TextEditingController _pesoSalidaController = TextEditingController();
 
   int? _selectedIndex;
-  //final String _apiUrl = 'http://192.168.1.43/api/engorda.php';
-  final String _apiUrl = 'http://ganabovino.atwebpages.com/api/engorda.php';
 
   @override
   void initState() {
@@ -82,7 +92,8 @@ class _EngordaPageState extends State<EngordaPage> {
         _isLoading = true;
       });
 
-      final response = await http.get(Uri.parse(_apiUrl));
+      final url = Uri.parse(getApiUrl('engorda'));
+      final response = await http.get(url);
 
       if (response.statusCode == 200) {
         final List<dynamic> animales = jsonDecode(response.body);
@@ -309,8 +320,9 @@ class _EngordaPageState extends State<EngordaPage> {
     };
 
     try {
+      final url = Uri.parse(getApiUrl('engorda'));
       final response = await http.post(
-        Uri.parse(_apiUrl),
+        url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -373,8 +385,9 @@ class _EngordaPageState extends State<EngordaPage> {
     };
 
     try {
+      final url = Uri.parse(getApiUrl('engorda'));
       final response = await http.put(
-        Uri.parse(_apiUrl),
+        url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -401,8 +414,9 @@ class _EngordaPageState extends State<EngordaPage> {
     final animalId = _animales[_selectedIndex!]['id'];
 
     try {
+      final url = Uri.parse(getApiUrl('engorda'));
       final response = await http.delete(
-        Uri.parse(_apiUrl),
+        url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -456,17 +470,12 @@ class _EngordaPageState extends State<EngordaPage> {
     if (valorCosto == null) return '\$0.00';
 
     try {
-      // Si es String, convertirlo a double
       if (valorCosto is String) {
         final costo = double.tryParse(valorCosto) ?? 0.0;
         return '\$${costo.toStringAsFixed(2)}';
-      }
-      // Si ya es num (int o double)
-      else if (valorCosto is num) {
+      } else if (valorCosto is num) {
         return '\$${valorCosto.toStringAsFixed(2)}';
-      }
-      // Para cualquier otro tipo
-      else {
+      } else {
         return '\$0.00';
       }
     } catch (e) {
@@ -479,17 +488,12 @@ class _EngordaPageState extends State<EngordaPage> {
     if (valorPeso == null) return 'N/A';
 
     try {
-      // Si es String, convertirlo a double
       if (valorPeso is String) {
         final peso = double.tryParse(valorPeso) ?? 0.0;
         return peso.toStringAsFixed(1);
-      }
-      // Si ya es num (int o double)
-      else if (valorPeso is num) {
+      } else if (valorPeso is num) {
         return valorPeso.toStringAsFixed(1);
-      }
-      // Para cualquier otro tipo
-      else {
+      } else {
         return 'N/A';
       }
     } catch (e) {

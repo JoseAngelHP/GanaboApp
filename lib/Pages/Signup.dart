@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter/foundation.dart'; // ← IMPORTANTE: Añade esta importación
+import 'package:flutter/foundation.dart'; // ← AÑADE ESTA IMPORTACIÓN
 import 'package:ganabo/Widgets/Header.dart';
 import 'package:ganabo/Widgets/Logo.dart';
 import 'package:ganabo/Widgets/TextFieldCustom.dart';
@@ -15,7 +15,14 @@ class SignUpPage extends StatefulWidget {
 
 // ← AÑADE ESTA FUNCIÓN FUERA DE LA CLASE
 String getApiUrl(String endpoint) {
-  return 'https://ganabovino.atwebpages.com/api/$endpoint.php';
+  // Para WEB: Usar HTTPS
+  if (kIsWeb) {
+    return 'https://ganabovino.atwebpages.com/api/$endpoint.php';
+  }
+  // Para MÓVIL: Usar HTTP
+  else {
+    return 'http://ganabovino.atwebpages.com/api/$endpoint.php';
+  }
 }
 
 class _SignUpPageState extends State<SignUpPage> {

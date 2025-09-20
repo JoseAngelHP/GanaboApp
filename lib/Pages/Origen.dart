@@ -1,6 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter/foundation.dart'; // ← AÑADE ESTA IMPORTACIÓN
+
+// ← AÑADE ESTA FUNCIÓN FUERA DE LA CLASE
+String getApiUrl(String endpoint) {
+  // Para WEB: Usar HTTPS
+  if (kIsWeb) {
+    return 'https://ganabovino.atwebpages.com/api/$endpoint.php';
+  }
+  // Para MÓVIL: Usar HTTP
+  else {
+    return 'http://ganabovino.atwebpages.com/api/$endpoint.php';
+  }
+}
 
 class OrigenPage extends StatefulWidget {
   const OrigenPage({Key? key}) : super(key: key);
@@ -16,17 +29,14 @@ class _OrigenPageState extends State<OrigenPage> {
   final TextEditingController _nombreFincaController = TextEditingController();
   final TextEditingController _colorGanadoController = TextEditingController();
 
-  // URL de la API
-  //final String _apiUrl = "http://192.168.1.43/api/origen.php";
-  final String _apiUrl = "http://ganabovino.atwebpages.com/api/origen.php";
-
   // Lista para almacenar los orígenes
   List<dynamic> _origenes = [];
 
   // Función para cargar orígenes desde la API
   Future<void> _cargarOrigenes() async {
     try {
-      final response = await http.get(Uri.parse(_apiUrl));
+      final url = Uri.parse(getApiUrl('origen'));
+      final response = await http.get(url);
       if (response.statusCode == 200) {
         setState(() {
           _origenes = json.decode(response.body);
@@ -362,8 +372,9 @@ class _OrigenPageState extends State<OrigenPage> {
     if (!_validarCampos()) return;
 
     try {
+      final url = Uri.parse(getApiUrl('origen'));
       final response = await http.post(
-        Uri.parse(_apiUrl),
+        url,
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'numero_arete': _numeroAreteController.text,
@@ -394,9 +405,8 @@ class _OrigenPageState extends State<OrigenPage> {
     }
 
     try {
-      final response = await http.get(
-        Uri.parse('$_apiUrl?numero_arete=${_numeroAreteController.text}'),
-      );
+      final url = Uri.parse("${getApiUrl('origen')}?numero_arete=${_numeroAreteController.text}");
+      final response = await http.get(url);
 
       final responseData = json.decode(response.body);
       
@@ -423,8 +433,9 @@ class _OrigenPageState extends State<OrigenPage> {
     }
 
     try {
+      final url = Uri.parse(getApiUrl('origen'));
       final response = await http.put(
-        Uri.parse(_apiUrl),
+        url,
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'numero_arete': _numeroAreteController.text,
@@ -454,8 +465,9 @@ class _OrigenPageState extends State<OrigenPage> {
     }
 
     try {
+      final url = Uri.parse(getApiUrl('origen'));
       final response = await http.delete(
-        Uri.parse(_apiUrl),
+        url,
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'numero_arete': _numeroAreteController.text,

@@ -1,6 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter/foundation.dart'; // ← AÑADE ESTA IMPORTACIÓN
+
+// ← AÑADE ESTA FUNCIÓN FUERA DE LA CLASE
+String getApiUrl(String endpoint) {
+  // Para WEB: Usar HTTPS
+  if (kIsWeb) {
+    return 'https://ganabovino.atwebpages.com/api/$endpoint.php';
+  }
+  // Para MÓVIL: Usar HTTP
+  else {
+    return 'http://ganabovino.atwebpages.com/api/$endpoint.php';
+  }
+}
 
 class MadrePage extends StatefulWidget {
   const MadrePage({Key? key}) : super(key: key);
@@ -18,47 +31,47 @@ class _MadrePageState extends State<MadrePage> {
   final TextEditingController _alturaController = TextEditingController();
   final TextEditingController _fechaController = TextEditingController();
 
-  // URL base de tu API
-  //final String baseUrl = "http://192.168.1.43/api/madre.php";
-  final String baseUrl = "http://ganabovino.atwebpages.com/api/madre.php";
-
   // Lista para almacenar las madres
   List<dynamic> _madres = [];
 
   // Función para mostrar mensajes
   void _mostrarMensaje(String mensaje) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensaje)),
+      SnackBar(
+        content: Text(mensaje),
+        duration: const Duration(seconds: 3),
+      ),
     );
   }
 
   // AGREGAR MADRE
   Future<void> _agregarMadre() async {
-    if (_validarCampos()) {
-      try {
-        final response = await http.post(
-          Uri.parse(baseUrl),
-          headers: {'Content-Type': 'application/json'},
-          body: json.encode({
-            'numero_arete': _numeroAreteController.text,
-            'nombre_madre': _nombreController.text,
-            'peso': double.parse(_pesoController.text),
-            'edad': int.parse(_edadController.text),
-            'altura': double.parse(_alturaController.text),
-            'fecha_apareamiento': _fechaController.text,
-          }),
-        );
+    if (!_validarCampos()) return;
 
-        final data = json.decode(response.body);
-        if (data['success']) {
-          _mostrarMensaje('Madre agregada correctamente');
-          _limpiarCampos();
-        } else {
-          _mostrarMensaje('Error: ${data['message']}');
-        }
-      } catch (e) {
-        _mostrarMensaje('Error de conexión: $e');
+    try {
+      final url = Uri.parse(getApiUrl('madre'));
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'numero_arete': _numeroAreteController.text,
+          'nombre_madre': _nombreController.text,
+          'peso': double.parse(_pesoController.text),
+          'edad': int.parse(_edadController.text),
+          'altura': double.parse(_alturaController.text),
+          'fecha_apareamiento': _fechaController.text,
+        }),
+      );
+
+      final responseData = json.decode(response.body);
+      if (responseData['success']) {
+        _mostrarMensaje('Madre agregada correctamente');
+        _limpiarCampos();
+      } else {
+        _mostrarMensaje('Error: ${responseData['message']}');
       }
+    } catch (e) {
+      _mostrarMensaje('Error de conexión: $e');
     }
   }
 
@@ -70,21 +83,22 @@ class _MadrePageState extends State<MadrePage> {
     }
 
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl?numero_arete=${_numeroAreteController.text}'),
-      );
+      final url = Uri.parse("${getApiUrl('madre')}?numero_arete=${_numeroAreteController.text}");
+      final response = await http.get(url);
 
-      final data = json.decode(response.body);
-      if (data['success']) {
-        final madre = data['data'];
-        _nombreController.text = madre['nombre_madre'];
-        _pesoController.text = madre['peso'].toString();
-        _edadController.text = madre['edad'].toString();
-        _alturaController.text = madre['altura'].toString();
-        _fechaController.text = madre['fecha_apareamiento'];
+      final responseData = json.decode(response.body);
+      if (responseData['success']) {
+        final madre = responseData['data'];
+        setState(() {
+          _nombreController.text = madre['nombre_madre'] ?? '';
+          _pesoController.text = madre['peso']?.toString() ?? '';
+          _edadController.text = madre['edad']?.toString() ?? '';
+          _alturaController.text = madre['altura']?.toString() ?? '';
+          _fechaController.text = madre['fecha_apareamiento'] ?? '';
+        });
         _mostrarMensaje('Madre encontrada');
       } else {
-        _mostrarMensaje('Madre no encontrada');
+        _mostrarMensaje(responseData['message']);
       }
     } catch (e) {
       _mostrarMensaje('Error de conexión: $e');
@@ -93,55 +107,76 @@ class _MadrePageState extends State<MadrePage> {
 
   // MODIFICAR MADRE
   Future<void> _modificarMadre() async {
-    if (_validarCampos()) {
-      try {
-        final response = await http.put(
-          Uri.parse(baseUrl),
-          headers: {'Content-Type': 'application/json'},
-          body: json.encode({
-            'numero_arete': _numeroAreteController.text,
-            'nombre_madre': _nombreController.text,
-            'peso': double.parse(_pesoController.text),
-            'edad': int.parse(_edadController.text),
-            'altura': double.parse(_alturaController.text),
-            'fecha_apareamiento': _fechaController.text,
-          }),
-        );
+    if (!_validarCampos()) return;
 
-        final data = json.decode(response.body);
-        if (data['success']) {
-          _mostrarMensaje('Madre modificada correctamente');
-        } else {
-          _mostrarMensaje('Error: ${data['message']}');
-        }
-      } catch (e) {
-        _mostrarMensaje('Error de conexión: $e');
+    try {
+      final url = Uri.parse(getApiUrl('madre'));
+      final response = await http.put(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'numero_arete': _numeroAreteController.text,
+          'nombre_madre': _nombreController.text,
+          'peso': double.parse(_pesoController.text),
+          'edad': int.parse(_edadController.text),
+          'altura': double.parse(_alturaController.text),
+          'fecha_apareamiento': _fechaController.text,
+        }),
+      );
+
+      final responseData = json.decode(response.body);
+      if (responseData['success']) {
+        _mostrarMensaje('Madre modificada correctamente');
+      } else {
+        _mostrarMensaje('Error: ${responseData['message']}');
       }
+    } catch (e) {
+      _mostrarMensaje('Error de conexión: $e');
     }
   }
 
   // ELIMINAR MADRE
   Future<void> _eliminarMadre() async {
     if (_numeroAreteController.text.isEmpty) {
-      _mostrarMensaje('Ingrese el número de arete para eliminar');
+      _mostrarMensaje('Ingrene el número de arete para eliminar');
       return;
     }
 
     try {
+      final url = Uri.parse(getApiUrl('madre'));
       final response = await http.delete(
-        Uri.parse(baseUrl),
+        url,
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'numero_arete': _numeroAreteController.text,
         }),
       );
 
-      final data = json.decode(response.body);
-      if (data['success']) {
+      final responseData = json.decode(response.body);
+      if (responseData['success']) {
         _mostrarMensaje('Madre eliminada correctamente');
         _limpiarCampos();
       } else {
-        _mostrarMensaje('Error: ${data['message']}');
+        _mostrarMensaje('Error: ${responseData['message']}');
+      }
+    } catch (e) {
+      _mostrarMensaje('Error de conexión: $e');
+    }
+  }
+
+  // FUNCIÓN PARA CARGAR LAS MADRES
+  Future<void> _cargarMadres() async {
+    try {
+      final url = Uri.parse(getApiUrl('madre'));
+      final response = await http.get(url);
+      final responseData = json.decode(response.body);
+      
+      if (responseData['success']) {
+        setState(() {
+          _madres = responseData['data'];
+        });
+      } else {
+        _mostrarMensaje('Error al cargar la lista: ${responseData['message']}');
       }
     } catch (e) {
       _mostrarMensaje('Error de conexión: $e');
@@ -150,30 +185,39 @@ class _MadrePageState extends State<MadrePage> {
 
   // LIMPIAR CAMPOS
   void _limpiarCampos() {
-    _numeroAreteController.clear();
-    _nombreController.clear();
-    _pesoController.clear();
-    _edadController.clear();
-    _alturaController.clear();
-    _fechaController.clear();
+    setState(() {
+      _numeroAreteController.clear();
+      _nombreController.clear();
+      _pesoController.clear();
+      _edadController.clear();
+      _alturaController.clear();
+      _fechaController.clear();
+    });
   }
 
-  // FUNCIÓN PARA CARGAR LAS MADRES
-  Future<void> _cargarMadres() async {
-    try {
-      final response = await http.get(Uri.parse(baseUrl));
-      final data = json.decode(response.body);
-      
-      if (data['success']) {
-        setState(() {
-          _madres = data['data'];
-        });
-      } else {
-        _mostrarMensaje('Error al cargar la lista: ${data['message']}');
-      }
-    } catch (e) {
-      _mostrarMensaje('Error de conexión: $e');
+  // VALIDAR CAMPOS
+  bool _validarCampos() {
+    if (_numeroAreteController.text.isEmpty ||
+        _nombreController.text.isEmpty ||
+        _pesoController.text.isEmpty ||
+        _edadController.text.isEmpty ||
+        _alturaController.text.isEmpty ||
+        _fechaController.text.isEmpty) {
+      _mostrarMensaje('Todos los campos son obligatorios');
+      return false;
     }
+    
+    // Validar que peso, edad y altura sean números válidos
+    try {
+      double.parse(_pesoController.text);
+      int.parse(_edadController.text);
+      double.parse(_alturaController.text);
+    } catch (e) {
+      _mostrarMensaje('Peso, edad y altura deben ser valores numéricos válidos');
+      return false;
+    }
+    
+    return true;
   }
 
   // VER LISTA - Navegar a lista de registros con diseño tabular
@@ -397,20 +441,6 @@ class _MadrePageState extends State<MadrePage> {
         ),
       );
     });
-  }
-
-  // VALIDAR CAMPOS
-  bool _validarCampos() {
-    if (_numeroAreteController.text.isEmpty ||
-        _nombreController.text.isEmpty ||
-        _pesoController.text.isEmpty ||
-        _edadController.text.isEmpty ||
-        _alturaController.text.isEmpty ||
-        _fechaController.text.isEmpty) {
-      _mostrarMensaje('Todos los campos son obligatorios');
-      return false;
-    }
-    return true;
   }
 
   // Función para construir los botones

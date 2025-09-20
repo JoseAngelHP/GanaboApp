@@ -2,6 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:ganabo/Pages/Pdf_Servicet.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter/foundation.dart'; // ← AÑADE ESTA IMPORTACIÓN
+
+// ← AÑADE ESTA FUNCIÓN FUERA DE LA CLASE
+String getApiUrl(String endpoint) {
+  // Para WEB: Usar HTTPS
+  if (kIsWeb) {
+    return 'https://ganabovino.atwebpages.com/api/$endpoint.php';
+  }
+  // Para MÓVIL: Usar HTTP
+  else {
+    return 'http://ganabovino.atwebpages.com/api/$endpoint.php';
+  }
+}
 
 class VacunacionPage extends StatefulWidget {
   const VacunacionPage({Key? key}) : super(key: key);
@@ -11,10 +24,6 @@ class VacunacionPage extends StatefulWidget {
 }
 
 class _VacunacionPageState extends State<VacunacionPage> {
-  // URL de tu API
-  //final String apiUrl = "http://192.168.1.43/api/vacunacion.php";
-  final String apiUrl = "http://ganabovino.atwebpages.com/api/vacunacion.php";
-  
   // Controladores para los TextFields
   final TextEditingController _numeroAreteController = TextEditingController();
   final TextEditingController _fechaVacunacionController = TextEditingController();
@@ -67,8 +76,9 @@ class _VacunacionPageState extends State<VacunacionPage> {
     if (!_validarCampos()) return;
 
     try {
+      final url = Uri.parse(getApiUrl('vacunacion'));
       final response = await http.post(
-        Uri.parse(apiUrl),
+        url,
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'numero_arete': _numeroAreteController.text,
@@ -106,9 +116,8 @@ class _VacunacionPageState extends State<VacunacionPage> {
     }
 
     try {
-      final response = await http.get(
-        Uri.parse('$apiUrl?numero_arete=${_numeroAreteController.text}'),
-      );
+      final url = Uri.parse("${getApiUrl('vacunacion')}?numero_arete=${_numeroAreteController.text}");
+      final response = await http.get(url);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -140,8 +149,9 @@ class _VacunacionPageState extends State<VacunacionPage> {
     if (!_validarCampos()) return;
 
     try {
+      final url = Uri.parse(getApiUrl('vacunacion'));
       final response = await http.put(
-        Uri.parse(apiUrl),
+        url,
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'numero_arete': _numeroAreteController.text,
@@ -178,8 +188,9 @@ class _VacunacionPageState extends State<VacunacionPage> {
     }
 
     try {
+      final url = Uri.parse(getApiUrl('vacunacion'));
       final response = await http.delete(
-        Uri.parse(apiUrl),
+        url,
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'numero_arete': _numeroAreteController.text,
@@ -202,7 +213,8 @@ class _VacunacionPageState extends State<VacunacionPage> {
   // CARGAR VACUNACIONES - Obtener todos los registros
   Future<void> _cargarVacunaciones() async {
     try {
-      final response = await http.get(Uri.parse(apiUrl));
+      final url = Uri.parse(getApiUrl('vacunacion'));
+      final response = await http.get(url);
       
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);

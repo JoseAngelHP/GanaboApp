@@ -1,6 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter/foundation.dart'; // ← AÑADE ESTA IMPORTACIÓN
+
+// ← AÑADE ESTA FUNCIÓN FUERA DE LA CLASE
+String getApiUrl(String endpoint) {
+  // Para WEB: Usar HTTPS
+  if (kIsWeb) {
+    return 'https://ganabovino.atwebpages.com/api/$endpoint.php';
+  }
+  // Para MÓVIL: Usar HTTP
+  else {
+    return 'http://ganabovino.atwebpages.com/api/$endpoint.php';
+  }
+}
 
 class RazaPage extends StatefulWidget {
   const RazaPage({Key? key}) : super(key: key);
@@ -18,17 +31,14 @@ class _RazaPageState extends State<RazaPage> {
   final TextEditingController _nombreRazaController = TextEditingController();
   final TextEditingController _alturaController = TextEditingController();
 
-  // URL de la API
-  //final String _apiUrl = "http://192.168.1.43/api/raza.php";
-  final String _apiUrl = "http://ganabovino.atwebpages.com/api/raza.php";
-
   // Lista para almacenar las razas
   List<dynamic> _razas = [];
 
   // Función para cargar razas desde la API
   Future<void> _cargarRazas() async {
     try {
-      final response = await http.get(Uri.parse(_apiUrl));
+      final url = Uri.parse(getApiUrl('raza'));
+      final response = await http.get(url);
       if (response.statusCode == 200) {
         setState(() {
           _razas = json.decode(response.body);
@@ -431,8 +441,9 @@ class _RazaPageState extends State<RazaPage> {
     if (!_validarCampos()) return;
 
     try {
+      final url = Uri.parse(getApiUrl('raza'));
       final response = await http.post(
-        Uri.parse(_apiUrl),
+        url,
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'numero_arete': _numeroAreteController.text,
@@ -460,14 +471,13 @@ class _RazaPageState extends State<RazaPage> {
   // Función para consultar raza
   Future<void> _consultarRaza() async {
     if (_numeroAreteController.text.isEmpty) {
-      _mostrarMensaje('Ingrese el número de arete para consultar');
+      _mostrarMensaje('Ingrene el número de arete para consultar');
       return;
     }
 
     try {
-      final response = await http.get(
-        Uri.parse('$_apiUrl?numero_arete=${_numeroAreteController.text}'),
-      );
+      final url = Uri.parse("${getApiUrl('raza')}?numero_arete=${_numeroAreteController.text}");
+      final response = await http.get(url);
 
       final responseData = json.decode(response.body);
       
@@ -491,13 +501,14 @@ class _RazaPageState extends State<RazaPage> {
   // Función para modificar raza
   Future<void> _modificarRaza() async {
     if (_numeroAreteController.text.isEmpty) {
-      _mostrarMensaje('Ingrese el número de arete para modificar');
+      _mostrarMensaje('Ingrene el número de arete para modificar');
       return;
     }
 
     try {
+      final url = Uri.parse(getApiUrl('raza'));
       final response = await http.put(
-        Uri.parse(_apiUrl),
+        url,
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'numero_arete': _numeroAreteController.text,
@@ -524,13 +535,14 @@ class _RazaPageState extends State<RazaPage> {
   // Función para eliminar raza
   Future<void> _eliminarRaza() async {
     if (_numeroAreteController.text.isEmpty) {
-      _mostrarMensaje('Ingrese el número de arete para eliminar');
+      _mostrarMensaje('Ingrene el número de arete para eliminar');
       return;
     }
 
     try {
+      final url = Uri.parse(getApiUrl('raza'));
       final response = await http.delete(
-        Uri.parse(_apiUrl),
+        url,
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'numero_arete': _numeroAreteController.text,

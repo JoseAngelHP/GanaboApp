@@ -7,7 +7,14 @@ import 'package:flutter/foundation.dart'; // ← AÑADE ESTA IMPORTACIÓN
 
 // ← AÑADE ESTA FUNCIÓN FUERA DE LA CLASE
 String getApiUrl(String endpoint) {
-  return 'https://ganabovino.atwebpages.com/api/$endpoint.php';
+  // Para WEB: Usar HTTPS
+  if (kIsWeb) {
+    return 'https://ganabovino.atwebpages.com/api/$endpoint.php';
+  }
+  // Para MÓVIL: Usar HTTP
+  else {
+    return 'http://ganabovino.atwebpages.com/api/$endpoint.php';
+  }
 }
 
 // Modelo de datos para el ganado
@@ -300,7 +307,7 @@ class _RegistroPageState extends State<RegistroPage> {
                 Navigator.of(context).pop();
                 _seleccionarFoto();
               },
-              child: const Text('Galería'),
+              child: const Text('Galería')
             ),
           ],
         );

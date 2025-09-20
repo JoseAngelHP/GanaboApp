@@ -2,7 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart'; // ← AÑADE ESTA IMPORTACIÓN
 import 'pdf_service.dart';
+
+// ← AÑADE ESTA FUNCIÓN FUERA DE LA CLASE
+String getApiUrl(String endpoint) {
+  // Para WEB: Usar HTTPS
+  if (kIsWeb) {
+    return 'https://ganabovino.atwebpages.com/api/$endpoint.php';
+  }
+  // Para MÓVIL: Usar HTTP
+  else {
+    return 'http://ganabovino.atwebpages.com/api/$endpoint.php';
+  }
+}
 
 class PesajePage extends StatefulWidget {
   const PesajePage({Key? key}) : super(key: key);
@@ -24,10 +37,7 @@ class _PesajePageState extends State<PesajePage> {
   bool _guardando = false;
   bool _buscando = false;
 
-  // Servicio de API
-  //static const String _baseUrl = 'http://192.168.1.43/api/pesaje.php';
-  static const String _baseUrl = 'http://ganabovino.atwebpages.com/api/pesaje.php';
-
+  // Headers para las peticiones HTTP
   static Map<String, String> get _headers => {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -38,8 +48,9 @@ class _PesajePageState extends State<PesajePage> {
     Map<String, dynamic> pesajeData,
   ) async {
     try {
+      final url = Uri.parse(getApiUrl('pesaje'));
       final response = await http.post(
-        Uri.parse(_baseUrl),
+        url,
         headers: _headers,
         body: json.encode(pesajeData),
       );
@@ -54,10 +65,8 @@ class _PesajePageState extends State<PesajePage> {
     String numeroArete,
   ) async {
     try {
-      final response = await http.get(
-        Uri.parse('$_baseUrl?numero_arete=$numeroArete'),
-        headers: _headers,
-      );
+      final url = Uri.parse("${getApiUrl('pesaje')}?numero_arete=$numeroArete");
+      final response = await http.get(url, headers: _headers);
       final responseData = json.decode(response.body);
 
       print('Respuesta de la API: $responseData'); // Debug
@@ -319,8 +328,8 @@ class _PesajePageState extends State<PesajePage> {
                       decimal: true,
                     ),
                     decoration: InputDecoration(
-                      labelText: "Longitud",
-                      hintText: "Ej: -99.1332080",
+                      labelText: 'Longitud',
+                      hintText: 'Ej: -99.1332080',
                       border: OutlineInputBorder(),
                     ),
                   ),
@@ -332,7 +341,7 @@ class _PesajePageState extends State<PesajePage> {
                           double.tryParse(lngController.text),
                           context,
                         ),
-                    child: Text("Obtener Dirección"),
+                    child: Text('Obtener Dirección'),
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size(double.infinity, 50),
                     ),
@@ -343,7 +352,7 @@ class _PesajePageState extends State<PesajePage> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text("Cancelar"),
+                child: Text('Cancelar'),
               ),
             ],
           ),
@@ -391,14 +400,14 @@ class _PesajePageState extends State<PesajePage> {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         setState(() {
           _ubicacionController.text =
-              "Coordenadas: ${lat.toStringAsFixed(6)}, ${lng.toStringAsFixed(6)}";
+              'Coordenadas: ${lat.toStringAsFixed(6)}, ${lng.toStringAsFixed(6)}';
         });
       }
     } catch (e) {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       setState(() {
         _ubicacionController.text =
-            "Coordenadas: ${lat.toStringAsFixed(6)}, ${lng.toStringAsFixed(6)}";
+            'Coordenadas: ${lat.toStringAsFixed(6)}, ${lng.toStringAsFixed(6)}';
       });
     }
   }
@@ -631,8 +640,9 @@ class _PesajePageState extends State<PesajePage> {
       final id = ultimoPesaje['id'];
 
       // Llamar a la API para modificar
+      final url = Uri.parse("${getApiUrl('pesaje')}?id=$id");
       final response = await http.put(
-        Uri.parse('$_baseUrl?id=$id'),
+        url,
         headers: _headers,
         body: json.encode(pesajeData),
       );
@@ -706,10 +716,8 @@ class _PesajePageState extends State<PesajePage> {
       final id = ultimoPesaje['id'];
 
       // Llamar a la API para eliminar
-      final response = await http.delete(
-        Uri.parse('$_baseUrl?id=$id'),
-        headers: _headers,
-      );
+      final url = Uri.parse("${getApiUrl('pesaje')}?id=$id");
+      final response = await http.delete(url, headers: _headers);
 
       final resultado = json.decode(response.body);
 
@@ -735,10 +743,8 @@ class _PesajePageState extends State<PesajePage> {
   // Función auxiliar para obtener todos los pesajes de un arete
   Future<List<dynamic>> _obtenerTodosPesajesPorArete(String numeroArete) async {
     try {
-      final response = await http.get(
-        Uri.parse('$_baseUrl?numero_arete=$numeroArete'),
-        headers: _headers,
-      );
+      final url = Uri.parse("${getApiUrl('pesaje')}?numero_arete=$numeroArete");
+      final response = await http.get(url, headers: _headers);
       final responseData = json.decode(response.body);
       if (responseData['success'] == true) return responseData['data'];
       return [];
@@ -750,7 +756,8 @@ class _PesajePageState extends State<PesajePage> {
   // Función para obtener todos los pesajes
   Future<List<dynamic>> _obtenerTodosPesajes() async {
     try {
-      final response = await http.get(Uri.parse(_baseUrl), headers: _headers);
+      final url = Uri.parse(getApiUrl('pesaje'));
+      final response = await http.get(url, headers: _headers);
       final responseData = json.decode(response.body);
       if (responseData['success'] == true) return responseData['data'];
       return [];

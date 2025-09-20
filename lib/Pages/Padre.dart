@@ -1,6 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter/foundation.dart'; // ← AÑADE ESTA IMPORTACIÓN
+
+// ← AÑADE ESTA FUNCIÓN FUERA DE LA CLASE
+String getApiUrl(String endpoint) {
+  // Para WEB: Usar HTTPS
+  if (kIsWeb) {
+    return 'https://ganabovino.atwebpages.com/api/$endpoint.php';
+  }
+  // Para MÓVIL: Usar HTTP
+  else {
+    return 'http://ganabovino.atwebpages.com/api/$endpoint.php';
+  }
+}
 
 class PadrePage extends StatefulWidget {
   const PadrePage({Key? key}) : super(key: key);
@@ -18,44 +31,47 @@ class _PadrePageState extends State<PadrePage> {
   final TextEditingController _alturaController = TextEditingController();
   final TextEditingController _fechaController = TextEditingController();
 
-  // URL base de tu API
-  //final String baseUrl = "http://192.168.1.43/api/padre.php";
-  final String baseUrl = "http://ganabovino.atwebpages.com/api/padre.php";
+  // Lista para almacenar los padres
+  List<dynamic> _padres = [];
 
   // Función para mostrar mensajes
   void _mostrarMensaje(String mensaje) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(mensaje)));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(mensaje),
+        duration: const Duration(seconds: 3),
+      ),
+    );
   }
 
   // AGREGAR PADRE
   Future<void> _agregarPadre() async {
-    if (_validarCampos()) {
-      try {
-        final response = await http.post(
-          Uri.parse(baseUrl),
-          headers: {'Content-Type': 'application/json'},
-          body: json.encode({
-            'numero_arete': _numeroAreteController.text,
-            'nombre_padre': _nombreController.text,
-            'peso': double.parse(_pesoController.text),
-            'edad': int.parse(_edadController.text),
-            'altura': double.parse(_alturaController.text),
-            'fecha_apareamiento': _fechaController.text,
-          }),
-        );
+    if (!_validarCampos()) return;
 
-        final data = json.decode(response.body);
-        if (data['success']) {
-          _mostrarMensaje('Padre agregado correctamente');
-          _limpiarCampos();
-        } else {
-          _mostrarMensaje('Error: ${data['message']}');
-        }
-      } catch (e) {
-        _mostrarMensaje('Error de conexión: $e');
+    try {
+      final url = Uri.parse(getApiUrl('padre'));
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'numero_arete': _numeroAreteController.text,
+          'nombre_padre': _nombreController.text,
+          'peso': double.parse(_pesoController.text),
+          'edad': int.parse(_edadController.text),
+          'altura': double.parse(_alturaController.text),
+          'fecha_apareamiento': _fechaController.text,
+        }),
+      );
+
+      final responseData = json.decode(response.body);
+      if (responseData['success']) {
+        _mostrarMensaje('Padre agregado correctamente');
+        _limpiarCampos();
+      } else {
+        _mostrarMensaje('Error: ${responseData['message']}');
       }
+    } catch (e) {
+      _mostrarMensaje('Error de conexión: $e');
     }
   }
 
@@ -67,21 +83,22 @@ class _PadrePageState extends State<PadrePage> {
     }
 
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl?numero_arete=${_numeroAreteController.text}'),
-      );
+      final url = Uri.parse("${getApiUrl('padre')}?numero_arete=${_numeroAreteController.text}");
+      final response = await http.get(url);
 
-      final data = json.decode(response.body);
-      if (data['success']) {
-        final padre = data['data'];
-        _nombreController.text = padre['nombre_padre'];
-        _pesoController.text = padre['peso'].toString();
-        _edadController.text = padre['edad'].toString();
-        _alturaController.text = padre['altura'].toString();
-        _fechaController.text = padre['fecha_apareamiento'];
+      final responseData = json.decode(response.body);
+      if (responseData['success']) {
+        final padre = responseData['data'];
+        setState(() {
+          _nombreController.text = padre['nombre_padre'] ?? '';
+          _pesoController.text = padre['peso']?.toString() ?? '';
+          _edadController.text = padre['edad']?.toString() ?? '';
+          _alturaController.text = padre['altura']?.toString() ?? '';
+          _fechaController.text = padre['fecha_apareamiento'] ?? '';
+        });
         _mostrarMensaje('Padre encontrado');
       } else {
-        _mostrarMensaje('Padre no encontrado');
+        _mostrarMensaje(responseData['message']);
       }
     } catch (e) {
       _mostrarMensaje('Error de conexión: $e');
@@ -90,30 +107,31 @@ class _PadrePageState extends State<PadrePage> {
 
   // MODIFICAR PADRE
   Future<void> _modificarPadre() async {
-    if (_validarCampos()) {
-      try {
-        final response = await http.put(
-          Uri.parse(baseUrl),
-          headers: {'Content-Type': 'application/json'},
-          body: json.encode({
-            'numero_arete': _numeroAreteController.text,
-            'nombre_padre': _nombreController.text,
-            'peso': double.parse(_pesoController.text),
-            'edad': int.parse(_edadController.text),
-            'altura': double.parse(_alturaController.text),
-            'fecha_apareamiento': _fechaController.text,
-          }),
-        );
+    if (!_validarCampos()) return;
 
-        final data = json.decode(response.body);
-        if (data['success']) {
-          _mostrarMensaje('Padre modificado correctamente');
-        } else {
-          _mostrarMensaje('Error: ${data['message']}');
-        }
-      } catch (e) {
-        _mostrarMensaje('Error de conexión: $e');
+    try {
+      final url = Uri.parse(getApiUrl('padre'));
+      final response = await http.put(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'numero_arete': _numeroAreteController.text,
+          'nombre_padre': _nombreController.text,
+          'peso': double.parse(_pesoController.text),
+          'edad': int.parse(_edadController.text),
+          'altura': double.parse(_alturaController.text),
+          'fecha_apareamiento': _fechaController.text,
+        }),
+      );
+
+      final responseData = json.decode(response.body);
+      if (responseData['success']) {
+        _mostrarMensaje('Padre modificado correctamente');
+      } else {
+        _mostrarMensaje('Error: ${responseData['message']}');
       }
+    } catch (e) {
+      _mostrarMensaje('Error de conexión: $e');
     }
   }
 
@@ -125,18 +143,38 @@ class _PadrePageState extends State<PadrePage> {
     }
 
     try {
+      final url = Uri.parse(getApiUrl('padre'));
       final response = await http.delete(
-        Uri.parse(baseUrl),
+        url,
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'numero_arete': _numeroAreteController.text}),
       );
 
-      final data = json.decode(response.body);
-      if (data['success']) {
+      final responseData = json.decode(response.body);
+      if (responseData['success']) {
         _mostrarMensaje('Padre eliminado correctamente');
         _limpiarCampos();
       } else {
-        _mostrarMensaje('Error: ${data['message']}');
+        _mostrarMensaje('Error: ${responseData['message']}');
+      }
+    } catch (e) {
+      _mostrarMensaje('Error de conexión: $e');
+    }
+  }
+
+  // Función para cargar los padres desde la API
+  Future<void> _cargarPadres() async {
+    try {
+      final url = Uri.parse(getApiUrl('padre'));
+      final response = await http.get(url);
+      final responseData = json.decode(response.body);
+
+      if (responseData['success']) {
+        setState(() {
+          _padres = responseData['data'];
+        });
+      } else {
+        _mostrarMensaje('Error al cargar la lista: ${responseData['message']}');
       }
     } catch (e) {
       _mostrarMensaje('Error de conexión: $e');
@@ -145,268 +183,14 @@ class _PadrePageState extends State<PadrePage> {
 
   // LIMPIAR CAMPOS
   void _limpiarCampos() {
-    _numeroAreteController.clear();
-    _nombreController.clear();
-    _pesoController.clear();
-    _edadController.clear();
-    _alturaController.clear();
-    _fechaController.clear();
-  }
-
-  // VER LISTA - Navegar a lista de registros con diseño tabular
-  void _verLista() {
-    _cargarPadres().then((_) {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder:
-              (context) => Scaffold(
-                appBar: AppBar(
-                  title: const Text('LISTA COMPLETA DE PADRES'),
-                  backgroundColor: Colors.blueGrey[800],
-                  foregroundColor: Colors.white,
-                  leading: IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ),
-                body: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      // Encabezados de la tabla
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.blueGrey[800],
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 15,
-                          horizontal: 8,
-                        ),
-                        child: const Row(
-                          children: [
-                            Expanded(
-                              flex: 2,
-                              child: Text(
-                                'N° ARETE',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                            Expanded(
-                              flex: 3,
-                              child: Text(
-                                'NOMBRE PADRE',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: Text(
-                                'PESO (kg)',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                            Expanded(
-                              flex: 1,
-                              child: Text(
-                                'EDAD',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: Text(
-                                'ALTURA (cm)',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                            Expanded(
-                              flex: 3,
-                              child: Text(
-                                'FECHA APAREAMIENTO',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-
-                      // Contenido de la tabla
-                      Expanded(
-                        child:
-                            _padres.isEmpty
-                                ? Center(
-                                  child: Text(
-                                    'No hay registros de padres',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                )
-                                : ListView.builder(
-                                  itemCount: _padres.length,
-                                  itemBuilder: (context, index) {
-                                    final padre = _padres[index];
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                        color:
-                                            index.isEven
-                                                ? Colors.grey[50]
-                                                : Colors.white,
-                                        border: Border(
-                                          bottom: BorderSide(
-                                            color: Colors.grey[300]!,
-                                          ),
-                                        ),
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 12,
-                                        horizontal: 8,
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          // N° Arete
-                                          Expanded(
-                                            flex: 2,
-                                            child: Text(
-                                              padre['numero_arete']
-                                                      ?.toString() ??
-                                                  'N/A',
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.normal,
-                                                fontSize: 11,
-                                              ),
-                                            ),
-                                          ),
-                                          // Nombre Padre
-                                          Expanded(
-                                            flex: 3,
-                                            child: Text(
-                                              padre['nombre_padre']
-                                                      ?.toString() ??
-                                                  'N/A',
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                fontSize: 11,
-                                              ),
-                                            ),
-                                          ),
-                                          // Peso
-                                          Expanded(
-                                            flex: 2,
-                                            child: Text(
-                                              padre['peso']?.toString() ??
-                                                  'N/A',
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                fontSize: 11,
-                                              ),
-                                            ),
-                                          ),
-                                          // Edad
-                                          Expanded(
-                                            flex: 1,
-                                            child: Text(
-                                              padre['edad']?.toString() ??
-                                                  'N/A',
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                fontSize: 11,
-                                              ),
-                                            ),
-                                          ),
-                                          // Altura
-                                          Expanded(
-                                            flex: 2,
-                                            child: Text(
-                                              padre['altura']?.toString() ??
-                                                  'N/A',
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                fontSize: 11,
-                                              ),
-                                            ),
-                                          ),
-                                          // Fecha Apareamiento
-                                          Expanded(
-                                            flex: 3,
-                                            child: Text(
-                                              padre['fecha_apareamiento']
-                                                      ?.toString() ??
-                                                  'N/A',
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                fontSize: 11,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-        ),
-      );
+    setState(() {
+      _numeroAreteController.clear();
+      _nombreController.clear();
+      _pesoController.clear();
+      _edadController.clear();
+      _alturaController.clear();
+      _fechaController.clear();
     });
-  }
-
-  // Lista para almacenar los padres
-  List<dynamic> _padres = [];
-
-  // Función para cargar los padres desde la API
-  Future<void> _cargarPadres() async {
-    try {
-      final response = await http.get(Uri.parse(baseUrl));
-      final data = json.decode(response.body);
-
-      if (data['success']) {
-        setState(() {
-          _padres = data['data'];
-        });
-      } else {
-        _mostrarMensaje('Error al cargar la lista: ${data['message']}');
-      }
-    } catch (e) {
-      _mostrarMensaje('Error de conexión: $e');
-    }
   }
 
   // VALIDAR CAMPOS
@@ -420,7 +204,241 @@ class _PadrePageState extends State<PadrePage> {
       _mostrarMensaje('Todos los campos son obligatorios');
       return false;
     }
+    
+    // Validar que peso, edad y altura sean números válidos
+    try {
+      double.parse(_pesoController.text);
+      int.parse(_edadController.text);
+      double.parse(_alturaController.text);
+    } catch (e) {
+      _mostrarMensaje('Peso, edad y altura deben ser valores numéricos válidos');
+      return false;
+    }
+    
     return true;
+  }
+
+  // VER LISTA - Navegar a lista de registros con diseño tabular
+  void _verLista() {
+    _cargarPadres().then((_) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => Scaffold(
+            appBar: AppBar(
+              title: const Text('LISTA COMPLETA DE PADRES'),
+              backgroundColor: Colors.blueGrey[800],
+              foregroundColor: Colors.white,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
+            body: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  // Encabezados de la tabla
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.blueGrey[800],
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 15,
+                      horizontal: 8,
+                    ),
+                    child: const Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            'N° ARETE',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 3,
+                          child: Text(
+                            'NOMBRE PADRE',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            'PESO (kg)',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Text(
+                            'EDAD',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            'ALTURA (cm)',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 3,
+                          child: Text(
+                            'FECHA APAREAMIENTO',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Contenido de la tabla
+                  Expanded(
+                    child: _padres.isEmpty
+                        ? Center(
+                            child: Text(
+                              'No hay registros de padres',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          )
+                        : ListView.builder(
+                            itemCount: _padres.length,
+                            itemBuilder: (context, index) {
+                              final padre = _padres[index];
+                              return Container(
+                                decoration: BoxDecoration(
+                                  color: index.isEven
+                                      ? Colors.grey[50]
+                                      : Colors.white,
+                                  border: Border(
+                                    bottom: BorderSide(
+                                      color: Colors.grey[300]!,
+                                    ),
+                                  ),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                  horizontal: 8,
+                                ),
+                                child: Row(
+                                  children: [
+                                    // N° Arete
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        padre['numero_arete']?.toString() ?? 'N/A',
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.normal,
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ),
+                                    // Nombre Padre
+                                    Expanded(
+                                      flex: 3,
+                                      child: Text(
+                                        padre['nombre_padre']?.toString() ?? 'N/A',
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ),
+                                    // Peso
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        padre['peso']?.toString() ?? 'N/A',
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ),
+                                    // Edad
+                                    Expanded(
+                                      flex: 1,
+                                      child: Text(
+                                        padre['edad']?.toString() ?? 'N/A',
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ),
+                                    // Altura
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        padre['altura']?.toString() ?? 'N/A',
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ),
+                                    // Fecha Apareamiento
+                                    Expanded(
+                                      flex: 3,
+                                      child: Text(
+                                        padre['fecha_apareamiento']?.toString() ?? 'N/A',
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    });
   }
 
   // Función para construir los botones
@@ -614,55 +632,5 @@ class _PadrePageState extends State<PadrePage> {
     _alturaController.dispose();
     _fechaController.dispose();
     super.dispose();
-  }
-}
-
-// Página para mostrar la lista de padres
-class ListaPadresPage extends StatelessWidget {
-  final String baseUrl;
-
-  const ListaPadresPage({Key? key, required this.baseUrl}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Lista de Padres')),
-      body: FutureBuilder<List<dynamic>>(
-        future: _obtenerPadres(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No hay padres registrados'));
-          } else {
-            return ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                final padre = snapshot.data![index];
-                return ListTile(
-                  title: Text(padre['nombre_padre']),
-                  subtitle: Text(
-                    'Arete: ${padre['numero_arete']} - Peso: ${padre['peso']}kg',
-                  ),
-                  trailing: Text('Edad: ${padre['edad']} años'),
-                );
-              },
-            );
-          }
-        },
-      ),
-    );
-  }
-
-  Future<List<dynamic>> _obtenerPadres() async {
-    final response = await http.get(Uri.parse(baseUrl));
-    final data = json.decode(response.body);
-    if (data['success']) {
-      return data['data'];
-    } else {
-      throw Exception('Error al obtener la lista');
-    }
   }
 }
