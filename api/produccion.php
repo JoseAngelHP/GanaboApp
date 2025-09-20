@@ -1,8 +1,10 @@
 <?php
+header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/json; charset=UTF-8");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    header("Access-Control-Allow-Origin: *");
-    header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-    header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
     http_response_code(200);
     exit();
 }
@@ -84,19 +86,21 @@ switch ($method) {
         break;
 
     case 'PUT':
-        // Actualizar registro existente por número de arete y fecha
+        // Actualizar registro existente - NUEVA VERSIÓN CORREGIDA
         $data = json_decode(file_get_contents("php://input"), true);
         
+        // Campos requeridos
         $numero_arete = $conn->real_escape_string($data['numero_arete']);
-        $fecha_ordeño = $conn->real_escape_string($data['fecha_ordeño']);
+        $fecha_original = $conn->real_escape_string($data['fecha_original']); // ← FECHA ORIGINAL
+        $nueva_fecha = $conn->real_escape_string($data['fecha_ordeño']); // ← NUEVA FECHA (puede ser diferente)
         $cantidad_leche = floatval($data['cantidad_leche']);
         $calidad_leche = $conn->real_escape_string($data['calidad_leche']);
         $persona_cargo = $conn->real_escape_string($data['persona_cargo']);
         $observaciones = isset($data['observaciones']) ? $conn->real_escape_string($data['observaciones']) : '';
         
-        // Buscar el ID del registro a actualizar
+        // Buscar el registro por numero_arete y fecha ORIGINAL
         $stmt_find = $conn->prepare("SELECT id FROM produccion WHERE numero_arete = ? AND fecha_ordeño = ?");
-        $stmt_find->bind_param("ss", $numero_arete, $fecha_ordeño);
+        $stmt_find->bind_param("ss", $numero_arete, $fecha_original);
         $stmt_find->execute();
         $result = $stmt_find->get_result();
         
@@ -104,15 +108,16 @@ switch ($method) {
             $row = $result->fetch_assoc();
             $id = $row['id'];
             
-            // Actualizar el registro
-            $stmt_update = $conn->prepare("UPDATE produccion SET cantidad_leche = ?, calidad_leche = ?, persona_cargo = ?, observaciones = ? WHERE id = ?");
-            $stmt_update->bind_param("dsssi", $cantidad_leche, $calidad_leche, $persona_cargo, $observaciones, $id);
+            // Actualizar el registro (incluyendo la nueva fecha si es diferente)
+            $stmt_update = $conn->prepare("UPDATE produccion SET fecha_ordeño = ?, cantidad_leche = ?, calidad_leche = ?, persona_cargo = ?, observaciones = ? WHERE id = ?");
+            $stmt_update->bind_param("sdsssi", $nueva_fecha, $cantidad_leche, $calidad_leche, $persona_cargo, $observaciones, $id);
             
             if ($stmt_update->execute()) {
                 echo json_encode(array(
                     "message" => "Registro actualizado exitosamente",
                     "numero_arete" => $numero_arete,
-                    "fecha_ordeño" => $fecha_ordeño
+                    "fecha_anterior" => $fecha_original,
+                    "fecha_nueva" => $nueva_fecha
                 ));
             } else {
                 http_response_code(400);
@@ -121,7 +126,7 @@ switch ($method) {
             $stmt_update->close();
         } else {
             http_response_code(404);
-            echo json_encode(array("message" => "No se encontró registro para el número de arete $numero_arete en la fecha $fecha_ordeño"));
+            echo json_encode(array("message" => "No se encontró registro para el número de arete $numero_arete en la fecha $fecha_original"));
         }
         $stmt_find->close();
         break;

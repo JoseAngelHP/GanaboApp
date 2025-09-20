@@ -2,16 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:ganabo/Pages/Pdf_Serviced.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter/foundation.dart'; // ← AÑADE ESTA IMPORTACIÓN
+import 'package:flutter/foundation.dart';
 
-// ← AÑADE ESTA FUNCIÓN FUERA DE LA CLASE
+// Función para obtener la URL de la API
 String getApiUrl(String endpoint) {
-  // Para WEB: Usar HTTPS
   if (kIsWeb) {
     return 'https://ganabovino.atwebpages.com/api/$endpoint.php';
-  }
-  // Para MÓVIL: Usar HTTP
-  else {
+  } else {
     return 'http://ganabovino.atwebpages.com/api/$endpoint.php';
   }
 }
@@ -30,12 +27,11 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
   final TextEditingController _cantidadController = TextEditingController();
   final TextEditingController _calidadController = TextEditingController();
   final TextEditingController _personaController = TextEditingController();
-  final TextEditingController _observacionesController =
-      TextEditingController();
+  final TextEditingController _observacionesController = TextEditingController();
 
+  List<Map<String, dynamic>> _producciones = [];
   bool _isLoading = false;
-  // ignore: unused_field
-  bool _generandoPDF = false;
+  String _fechaOriginal = ''; // ← NUEVA VARIABLE PARA GUARDAR LA FECHA ORIGINAL
 
   // Headers para las peticiones HTTP
   static const Map<String, String> headers = {
@@ -43,8 +39,27 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
     'Accept': 'application/json',
   };
 
+  // Función para mostrar mensajes
+  void _mostrarMensaje(String mensaje) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(mensaje)),
+    );
+  }
+
+  // Función para limpiar campos
+  void _limpiarCampos() {
+    _numeroAreteController.clear();
+    _fechaController.clear();
+    _cantidadController.clear();
+    _calidadController.clear();
+    _personaController.clear();
+    _observacionesController.clear();
+    _fechaOriginal = ''; // ← Limpiar también la fecha original
+    _mostrarMensaje('Campos limpiados');
+  }
+
   // Función para seleccionar fecha
-  Future<void> _seleccionarFecha(BuildContext context) async {
+  Future<void> _seleccionarFecha() async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -54,74 +69,70 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
 
     if (picked != null) {
       setState(() {
-        _fechaController.text = '${picked.day}/${picked.month}/${picked.year}';
+        _fechaController.text = '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
       });
     }
   }
 
-  // Convertir fecha de formato dd/mm/yyyy a yyyy-mm-dd
-  String _convertirFecha(String fecha) {
-    final parts = fecha.split('/');
-    if (parts.length == 3) {
-      return '${parts[2]}-${parts[1].padLeft(2, '0')}-${parts[0].padLeft(2, '0')}';
+  // Función para validar campos obligatorios
+  bool _validarCampos() {
+    if (_numeroAreteController.text.isEmpty ||
+        _fechaController.text.isEmpty ||
+        _cantidadController.text.isEmpty ||
+        _calidadController.text.isEmpty ||
+        _personaController.text.isEmpty) {
+      _mostrarMensaje('Por favor, complete todos los campos obligatorios');
+      return false;
     }
-    return fecha;
+    return true;
   }
 
-  // AGREGAR REGISTRO
-  void _agregarRegistro() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+  // AGREGAR - Crear nuevo registro
+  Future<void> _agregarRegistro() async {
+    if (!_validarCampos()) return;
 
-      try {
-        final registro = {
-          'numero_arete': _numeroAreteController.text,
-          'fecha_ordeño': _convertirFecha(_fechaController.text),
-          'cantidad_leche': double.parse(_cantidadController.text),
-          'calidad_leche': _calidadController.text,
-          'persona_cargo': _personaController.text,
-          'observaciones': _observacionesController.text,
-        };
+    setState(() {
+      _isLoading = true;
+    });
 
-        final url = Uri.parse(getApiUrl('produccion'));
-        final response = await http.post(
-          url,
-          headers: headers,
-          body: json.encode(registro),
-        );
+    try {
+      final registro = {
+        'numero_arete': _numeroAreteController.text,
+        'fecha_ordeño': _fechaController.text,
+        'cantidad_leche': double.parse(_cantidadController.text),
+        'calidad_leche': _calidadController.text,
+        'persona_cargo': _personaController.text,
+        'observaciones': _observacionesController.text.isNotEmpty 
+            ? _observacionesController.text 
+            : '',
+      };
 
-        if (response.statusCode == 201) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Registro agregado correctamente')),
-          );
-          _limpiarCampos();
-        } else {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Error: ${response.body}')));
-        }
-      } catch (e) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error de conexión: $e')));
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
-  // CONSULTAR REGISTRO por número de arete
-  void _consultarRegistro() async {
-    if (_numeroAreteController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Ingrese un número de arete para consultar'),
-        ),
+      final url = Uri.parse(getApiUrl('produccion'));
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: json.encode(registro),
       );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        _mostrarMensaje('Registro agregado correctamente');
+        _limpiarCampos();
+      } else {
+        _mostrarMensaje('Error al agregar: ${response.statusCode}');
+      }
+    } catch (e) {
+      _mostrarMensaje('Error de conexión: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  // CONSULTAR - Buscar por número de arete
+  Future<void> _consultarRegistro() async {
+    if (_numeroAreteController.text.isEmpty) {
+      _mostrarMensaje('Ingrese el número de arete para consultar');
       return;
     }
 
@@ -133,536 +144,418 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
       final url = Uri.parse("${getApiUrl('produccion')}?numero_arete=${_numeroAreteController.text}");
       final response = await http.get(url, headers: headers);
 
-      if (!mounted) return;
-
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-
-        if (data.isNotEmpty) {
-          // Ordenar por fecha para obtener el registro más reciente
+        final data = json.decode(response.body);
+        if (data is List && data.isNotEmpty) {
+          // Ordenar por fecha y mostrar el último registro
           data.sort((a, b) => b['fecha_ordeño'].compareTo(a['fecha_ordeño']));
-          final registroMasReciente = data[0];
-
-          // Llenar los campos automáticamente
-          _fechaController.text = _convertirFechaParaMostrar(
-            registroMasReciente['fecha_ordeño'],
-          );
-          _cantidadController.text =
-              registroMasReciente['cantidad_leche'].toString();
-          _calidadController.text =
-              registroMasReciente['calidad_leche'].toString();
-          _personaController.text =
-              registroMasReciente['persona_cargo'].toString();
-          _observacionesController.text =
-              registroMasReciente['observaciones']?.toString() ?? '';
-
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('Registro cargado')));
+          final ultimoRegistro = data[0];
+          
+          // GUARDAR LA FECHA ORIGINAL ← NUEVO
+          _fechaOriginal = ultimoRegistro['fecha_ordeño'] ?? '';
+          
+          _fechaController.text = ultimoRegistro['fecha_ordeño'] ?? '';
+          _cantidadController.text = ultimoRegistro['cantidad_leche']?.toString() ?? '';
+          _calidadController.text = ultimoRegistro['calidad_leche'] ?? '';
+          _personaController.text = ultimoRegistro['persona_cargo'] ?? '';
+          _observacionesController.text = ultimoRegistro['observaciones'] ?? '';
+          
+          _mostrarMensaje('Registro cargado correctamente');
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('No se encontraron registros')),
-          );
+          _mostrarMensaje('No se encontraron registros');
         }
       } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: ${response.body}')));
+        _mostrarMensaje('Error en la consulta: ${response.statusCode}');
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error de conexión: $e')));
+      _mostrarMensaje('Error de conexión: $e');
     } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
-  // Función auxiliar para convertir fecha de yyyy-mm-dd a dd/mm/yyyy
-  String _convertirFechaParaMostrar(String fecha) {
-    final partes = fecha.split('-');
-    if (partes.length == 3) {
-      return '${partes[2]}/${partes[1]}/${partes[0]}';
-    }
-    return fecha;
-  }
-
-  // MODIFICAR REGISTRO
-  void _modificarRegistro() async {
-    if (_formKey.currentState!.validate()) {
-      if (_numeroAreteController.text.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Ingrese un número de arete')),
-        );
-        return;
-      }
-
       setState(() {
-        _isLoading = true;
+        _isLoading = false;
       });
-
-      try {
-        final registro = {
-          'numero_arete': _numeroAreteController.text,
-          'fecha_ordeño': _convertirFecha(_fechaController.text),
-          'cantidad_leche': double.parse(_cantidadController.text),
-          'calidad_leche': _calidadController.text,
-          'persona_cargo': _personaController.text,
-          'observaciones': _observacionesController.text,
-        };
-
-        final url = Uri.parse(getApiUrl('produccion'));
-        final response = await http.put(
-          url,
-          headers: headers,
-          body: json.encode(registro),
-        );
-
-        if (response.statusCode == 200) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Registro modificado correctamente')),
-          );
-        } else {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Error: ${response.body}')));
-        }
-      } catch (e) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error de conexión: $e')));
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
-      }
     }
   }
 
-  // ELIMINAR REGISTRO
-  void _eliminarRegistro() async {
-    if (_numeroAreteController.text.isEmpty || _fechaController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingrese número de arete y fecha')),
-      );
+  // MODIFICAR - Actualizar registro (CORREGIDO)
+  Future<void> _modificarRegistro() async {
+    if (!_validarCampos()) return;
+
+    // Verificar que se haya consultado primero un registro
+    if (_fechaOriginal.isEmpty) {
+      _mostrarMensaje('Primero consulte un registro para modificar');
       return;
     }
 
-    showDialog(
-      context: context,
-      builder:
-          (dialogContext) => AlertDialog(
-            title: const Text('Eliminar'),
-            content: const Text('¿Está seguro de eliminar este registro?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext),
-                child: const Text('Cancelar'),
-              ),
-              TextButton(
-                onPressed: () async {
-                  Navigator.pop(dialogContext); // Cerrar el diálogo primero
+    setState(() {
+      _isLoading = true;
+    });
 
-                  // Verificar si el widget está montado antes de setState
-                  if (mounted) {
-                    setState(() {
-                      _isLoading = true;
-                    });
-                  }
-
-                  try {
-                    final data = {
-                      'numero_arete': _numeroAreteController.text,
-                      'fecha_ordeño': _convertirFecha(_fechaController.text),
-                    };
-
-                    final url = Uri.parse(getApiUrl('produccion'));
-                    final response = await http.delete(
-                      url,
-                      headers: headers,
-                      body: json.encode(data),
-                    );
-
-                    // Verificar si el widget sigue montado antes de interactuar con UI
-                    if (!mounted) return;
-
-                    if (response.statusCode == 200) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Registro eliminado')),
-                      );
-                      _limpiarCampos();
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error: ${response.body}')),
-                      );
-                    }
-                  } catch (e) {
-                    // Verificar si el widget sigue montado antes de mostrar error
-                    if (!mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error de conexión: $e')),
-                    );
-                  } finally {
-                    // Verificar si el widget sigue montado antes de setState
-                    if (mounted) {
-                      setState(() {
-                        _isLoading = false;
-                      });
-                    }
-                  }
-                },
-                child: const Text('Eliminar'),
-              ),
-            ],
-          ),
-    );
-  }
-
-  void _limpiarCampos() {
-    _numeroAreteController.clear();
-    _fechaController.clear();
-    _observacionesController.clear();
-    _cantidadController.clear();
-    _calidadController.clear();
-    _personaController.clear();
-    setState(() {});
-  }
-
-  void _verLista() async {
     try {
-      // Obtener todos los registros
+      final registro = {
+        'numero_arete': _numeroAreteController.text,
+        'fecha_original': _fechaOriginal, // ← FECHA ORIGINAL (la que tenía cuando consultaste)
+        'fecha_ordeño': _fechaController.text, // ← NUEVA FECHA (puede ser diferente)
+        'cantidad_leche': double.parse(_cantidadController.text),
+        'calidad_leche': _calidadController.text,
+        'persona_cargo': _personaController.text,
+        'observaciones': _observacionesController.text.isNotEmpty 
+            ? _observacionesController.text 
+            : '',
+      };
+
       final url = Uri.parse(getApiUrl('produccion'));
-      final response = await http.get(url, headers: headers);
+      final response = await http.put(
+        url,
+        headers: headers,
+        body: json.encode(registro),
+      );
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+        _mostrarMensaje('Registro modificado correctamente');
+        // Actualizar la fecha original por si quieres modificar again
+        _fechaOriginal = _fechaController.text;
+      } else {
+        _mostrarMensaje('Error al modificar: ${response.statusCode}');
+      }
+    } catch (e) {
+      _mostrarMensaje('Error de conexión: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder:
-                (context) => Scaffold(
-                  appBar: AppBar(
-                    title: const Text('LISTA COMPLETA DE REGISTROS'),
-                    backgroundColor: Colors.blueGrey[800],
-                    foregroundColor: Colors.white,
-                    leading: IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: () => Navigator.of(context).pop(),
+  // ELIMINAR - Borrar registro
+  Future<void> _eliminarRegistro() async {
+    if (_numeroAreteController.text.isEmpty || _fechaController.text.isEmpty) {
+      _mostrarMensaje('Ingrese número de arete y fecha para eliminar');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Usar parámetros GET para mejor compatibilidad
+      final numeroArete = Uri.encodeComponent(_numeroAreteController.text);
+      final fecha = Uri.encodeComponent(_fechaController.text);
+      final url = Uri.parse("${getApiUrl('produccion')}?numero_arete=$numeroArete&fecha_ordeño=$fecha");
+      
+      final response = await http.delete(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        _mostrarMensaje('Registro eliminado correctamente');
+        _limpiarCampos();
+      } else {
+        _mostrarMensaje('Error al eliminar: ${response.statusCode}');
+      }
+    } catch (e) {
+      _mostrarMensaje('Error de conexión: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  // CARGAR PRODUCCIONES - Obtener todos los registros
+  Future<void> _cargarProducciones() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final url = Uri.parse(getApiUrl('produccion'));
+      final response = await http.get(url, headers: headers);
+      
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        setState(() {
+          _producciones = List<Map<String, dynamic>>.from(data);
+        });
+      } else {
+        _mostrarMensaje('Error al cargar: ${response.statusCode}');
+      }
+    } catch (e) {
+      _mostrarMensaje('Error de conexión: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  // GENERAR PDF
+  Future<void> _generarPDF() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Cargar los datos primero
+      await _cargarProducciones();
+      
+      if (_producciones.isEmpty) {
+        _mostrarMensaje('No hay registros para generar PDF');
+        return;
+      }
+      
+      // Crear instancia del servicio PDF
+      final pdfService = PdfServiced();
+      
+      // Generar y abrir PDF
+      await pdfService.guardarYAbrirPdf(
+        _producciones,
+        'Reporte_Produccion_Leche_${DateTime.now().millisecondsSinceEpoch}'
+      );
+      
+      _mostrarMensaje('PDF generado exitosamente');
+    } catch (e) {
+      _mostrarMensaje('Error al generar PDF: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  // VER LISTA - Navegar a lista de registros
+  void _verLista() {
+    _cargarProducciones().then((_) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => Scaffold(
+            appBar: AppBar(
+              title: const Text('LISTA COMPLETA DE PRODUCCIÓN'),
+              backgroundColor: Colors.blueGrey[800],
+              foregroundColor: Colors.white,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
+            body: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  // Encabezados de la tabla
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.blueGrey[800],
+                      borderRadius: BorderRadius.circular(5),
                     ),
-                  ),
-                  body: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 15,
+                      horizontal: 8,
+                    ),
+                    child: const Row(
                       children: [
-                        // Encabezados de la tabla
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.blueGrey[800],
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 15,
-                            horizontal: 10,
-                          ),
-                          child: const Row(
-                            children: [
-                              Expanded(
-                                flex: 2,
-                                child: Text(
-                                  'N° ARETE',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              Expanded(
-                                flex: 2,
-                                child: Text(
-                                  'FECHA ORDEÑO',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              Expanded(
-                                flex: 2,
-                                child: Text(
-                                  'CANTIDAD (L)',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              Expanded(
-                                flex: 2,
-                                child: Text(
-                                  'CALIDAD',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              Expanded(
-                                flex: 2,
-                                child: Text(
-                                  'PERSONA',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              Expanded(
-                                flex: 3,
-                                child: Text(
-                                  'OBSERVACIONES',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ],
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            'N° ARETE',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
                         ),
-                        const SizedBox(height: 10),
-
-                        // Contenido de la tabla
                         Expanded(
-                          child:
-                              data.isEmpty
-                                  ? Center(
-                                    child: Text(
-                                      'No hay registros de ordeño',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        color: Colors.grey[600],
-                                      ),
-                                    ),
-                                  )
-                                  : ListView.builder(
-                                    itemCount: data.length,
-                                    itemBuilder: (context, index) {
-                                      final registro = data[index];
-                                      return Container(
-                                        decoration: BoxDecoration(
-                                          color:
-                                              index.isEven
-                                                  ? Colors.grey[50]
-                                                  : Colors.white,
-                                          border: Border(
-                                            bottom: BorderSide(
-                                              color: Colors.grey[300]!,
-                                            ),
-                                          ),
-                                        ),
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 12,
-                                          horizontal: 10,
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            // N° Arete
-                                            Expanded(
-                                              flex: 2,
-                                              child: Text(
-                                                registro['numero_arete']
-                                                        ?.toString() ??
-                                                    '',
-                                                textAlign: TextAlign.center,
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.normal,
-                                                  fontSize: 13,
-                                                ),
-                                              ),
-                                            ),
-                                            // Fecha Ordeño
-                                            Expanded(
-                                              flex: 2,
-                                              child: Text(
-                                                registro['fecha_ordeño']
-                                                        ?.toString() ??
-                                                    '',
-                                                textAlign: TextAlign.center,
-                                                style: const TextStyle(
-                                                  fontSize: 13,
-                                                ),
-                                              ),
-                                            ),
-                                            // Cantidad
-                                            Expanded(
-                                              flex: 2,
-                                              child: Text(
-                                                registro['cantidad_leche']
-                                                        ?.toString() ??
-                                                    '',
-                                                textAlign: TextAlign.center,
-                                                style: const TextStyle(
-                                                  fontSize: 13,
-                                                ),
-                                              ),
-                                            ),
-                                            // Calidad
-                                            Expanded(
-                                              flex: 2,
-                                              child: Text(
-                                                registro['calidad_leche']
-                                                        ?.toString() ??
-                                                    '',
-                                                textAlign: TextAlign.center,
-                                                style: const TextStyle(
-                                                  fontSize: 13,
-                                                ),
-                                              ),
-                                            ),
-                                            // Persona a cargo
-                                            Expanded(
-                                              flex: 2,
-                                              child: Text(
-                                                registro['persona_cargo']
-                                                        ?.toString() ??
-                                                    '',
-                                                textAlign: TextAlign.center,
-                                                style: const TextStyle(
-                                                  fontSize: 13,
-                                                ),
-                                              ),
-                                            ),
-                                            // Observaciones
-                                            Expanded(
-                                              flex: 3,
-                                              child: Text(
-                                                registro['observaciones']
-                                                        ?.toString() ??
-                                                    'Sin observaciones',
-                                                textAlign: TextAlign.center,
-                                                style: const TextStyle(
-                                                  fontSize: 13,
-                                                ),
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    },
-                                  ),
+                          flex: 2,
+                          child: Text(
+                            'FECHA ORDEÑO',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            'CANTIDAD (L)',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            'CALIDAD',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            'PERSONA CARGO',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 3,
+                          child: Text(
+                            'OBSERVACIONES',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ),
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al cargar registros: ${response.body}'),
-          ),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error de conexión: $e')));
-    }
-  }
+                  const SizedBox(height: 10),
 
-  void _generarPDF() async {
-    setState(() => _generandoPDF = true);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const CircularProgressIndicator(),
-            const SizedBox(width: 10),
-            const Text('Generando PDF...'),
-          ],
+                  // Contenido de la tabla
+                  Expanded(
+                    child: _producciones.isEmpty
+                        ? Center(
+                            child: Text(
+                              'No hay registros de producción',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          )
+                        : ListView.builder(
+                            itemCount: _producciones.length,
+                            itemBuilder: (context, index) {
+                              final produccion = _producciones[index];
+                              return Container(
+                                decoration: BoxDecoration(
+                                  color: index.isEven
+                                      ? Colors.grey[50]
+                                      : Colors.white,
+                                  border: Border(
+                                    bottom: BorderSide(
+                                      color: Colors.grey[300]!,
+                                    ),
+                                  ),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                  horizontal: 8,
+                                ),
+                                child: Row(
+                                  children: [
+                                    // N° Arete
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        produccion['numero_arete']?.toString() ?? '',
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ),
+                                    // Fecha Ordeño
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        produccion['fecha_ordeño']?.toString() ?? '',
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ),
+                                    // Cantidad
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        produccion['cantidad_leche']?.toString() ?? '',
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ),
+                                    // Calidad
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        produccion['calidad_leche']?.toString() ?? '',
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ),
+                                    // Persona a cargo
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        produccion['persona_cargo']?.toString() ?? '',
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ),
+                                    // Observaciones
+                                    Expanded(
+                                      flex: 3,
+                                      child: Text(
+                                        produccion['observaciones']?.toString() ?? 'Sin observaciones',
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-
-    try {
-      // Obtener todos los registros
-      final url = Uri.parse(getApiUrl('produccion'));
-      final response = await http.get(url, headers: headers);
-
-      if (response.statusCode == 200) {
-        final List<dynamic> registros = json.decode(response.body);
-
-        if (registros.isEmpty) {
-          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('No hay registros para generar PDF')),
-          );
-        } else {
-          final pdfService = PdfServiced();
-          final fecha =
-              DateTime.now()
-                  .toString()
-                  .replaceAll(' ', '_')
-                  .replaceAll(':', '-')
-                  .split('.')[0];
-          final fileName = 'produccion_leche_$fecha';
-
-          // Guardar y abrir PDF
-          await pdfService.guardarYAbrirPdf(registros, fileName);
-
-          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('PDF guardado exitosamente')),
-          );
-        }
-      } else {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al obtener datos: ${response.body}')),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error al generar PDF: $e')));
-    } finally {
-      setState(() => _generandoPDF = false);
-    }
+      );
+    });
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: Colors.grey[350],
-    appBar: AppBar(
-      title: const Text("Producción de leche"),
-      backgroundColor: Colors.yellow[100],
-    ),
-    body:
-        _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[350],
+      appBar: AppBar(
+        title: const Text("Producción de leche"),
+        backgroundColor: Colors.yellow[100],
+      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Form(
                 key: _formKey,
@@ -690,12 +583,6 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
                         filled: true,
                         fillColor: Colors.white,
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor ingrese el número de arete';
-                        }
-                        return null;
-                      },
                     ),
                     const SizedBox(height: 15),
 
@@ -712,16 +599,10 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
                         fillColor: Colors.white,
                         suffixIcon: IconButton(
                           icon: const Icon(Icons.calendar_today),
-                          onPressed: () => _seleccionarFecha(context),
+                          onPressed: _seleccionarFecha,
                         ),
                       ),
-                      onTap: () => _seleccionarFecha(context),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor seleccione la fecha de ordeño';
-                        }
-                        return null;
-                      },
+                      onTap: _seleccionarFecha,
                     ),
                     const SizedBox(height: 15),
 
@@ -737,15 +618,6 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
                         fillColor: Colors.white,
                       ),
                       keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor ingrese la cantidad';
-                        }
-                        if (double.tryParse(value) == null) {
-                          return 'Ingrese un número válido';
-                        }
-                        return null;
-                      },
                     ),
                     const SizedBox(height: 15),
 
@@ -760,12 +632,6 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
                         filled: true,
                         fillColor: Colors.white,
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor ingrese la calidad';
-                        }
-                        return null;
-                      },
                     ),
                     const SizedBox(height: 15),
 
@@ -780,12 +646,6 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
                         filled: true,
                         fillColor: Colors.white,
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor ingrese la persona a cargo';
-                        }
-                        return null;
-                      },
                     ),
                     const SizedBox(height: 15),
 
@@ -802,7 +662,6 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
                         alignLabelWithHint: true,
                       ),
                       maxLines: 3,
-                      textAlignVertical: TextAlignVertical.top,
                     ),
                     const SizedBox(height: 25),
 
@@ -874,7 +733,8 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
                 ),
               ),
             ),
-  );
+    );
+  }
 
   @override
   void dispose() {
