@@ -3,6 +3,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter/foundation.dart'; // ← AÑADE ESTA IMPORTACIÓN
+
+// ← AÑADE ESTA FUNCIÓN FUERA DE LA CLASE
+String getApiUrl(String endpoint) {
+  return 'https://ganabovino.atwebpages.com/api/$endpoint.php';
+}
 
 // Modelo de datos para el ganado
 class Animal {
@@ -83,16 +89,11 @@ class _RegistroPageState extends State<RegistroPage> {
   List<Animal> _animales = [];
   // Animal seleccionado para modificar
   Animal? _animalSeleccionado;
-  // URL de tu API
-  //final String _apiUrl = "http://192.168.1.43/api/animales.php";
-  final String _apiUrl = 'http://ganabovino.atwebpages.com/api/animales.php';
 
   Future<void> _cargarRazasDesdeBD() async {
     try {
-      final response = await http.get(
-        //Uri.parse('http://192.168.1.43/api/todos.php'),
-        Uri.parse('http://ganabovino.atwebpages.com/api/todos.php'),
-      );
+      final url = Uri.parse(getApiUrl('todos'));
+      final response = await http.get(url);
 
       if (response.statusCode == 200) {
         // DEBUG: Imprime la respuesta para verificar
@@ -132,9 +133,8 @@ class _RegistroPageState extends State<RegistroPage> {
 
   Future<void> _cargarOrigenesDesdeBD() async {
     try {
-      final response = await http.get(
-        Uri.parse('http://ganabovino.atwebpages.com/api/todost.php'),
-      );
+      final url = Uri.parse(getApiUrl('todost'));
+      final response = await http.get(url);
 
       if (response.statusCode == 200) {
         // DEBUG: Imprime la respuesta para verificar
@@ -163,9 +163,8 @@ class _RegistroPageState extends State<RegistroPage> {
 
   Future<void> _cargarPadresDesdeBD() async {
     try {
-      final response = await http.get(
-        Uri.parse('http://ganabovino.atwebpages.com/api/todostr.php'),
-      );
+      final url = Uri.parse(getApiUrl('todostr'));
+      final response = await http.get(url);
 
       if (response.statusCode == 200) {
         // DEBUG: Imprime la respuesta para verificar
@@ -200,9 +199,8 @@ class _RegistroPageState extends State<RegistroPage> {
 
   Future<void> _cargarMadresDesdeBD() async {
     try {
-      final response = await http.get(
-        Uri.parse('http://ganabovino.atwebpages.com/api/todosfo.php'),
-      );
+      final url = Uri.parse(getApiUrl('todosfo'));
+      final response = await http.get(url);
 
       if (response.statusCode == 200) {
         // DEBUG: Imprime la respuesta para verificar
@@ -248,7 +246,8 @@ class _RegistroPageState extends State<RegistroPage> {
   // Cargar todos los animales desde la API
   Future<void> _cargarAnimales() async {
     try {
-      final response = await http.get(Uri.parse(_apiUrl));
+      final url = Uri.parse(getApiUrl('animales'));
+      final response = await http.get(url);
 
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
@@ -324,8 +323,9 @@ class _RegistroPageState extends State<RegistroPage> {
           fotoPath: _foto?.path,
         );
 
+        final url = Uri.parse(getApiUrl('animales'));
         final response = await http.post(
-          Uri.parse(_apiUrl),
+          url,
           headers: {'Content-Type': 'application/json'},
           body: json.encode(nuevoAnimal.toMap()),
         );
@@ -361,9 +361,8 @@ class _RegistroPageState extends State<RegistroPage> {
     }
 
     try {
-      final response = await http.get(
-        Uri.parse("$_apiUrl?numero_arete=$numeroArete"),
-      );
+      final url = Uri.parse("${getApiUrl('animales')}?numero_arete=$numeroArete");
+      final response = await http.get(url);
 
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
@@ -429,8 +428,9 @@ class _RegistroPageState extends State<RegistroPage> {
           fotoPath: _foto?.path,
         );
 
+        final url = Uri.parse(getApiUrl('animales'));
         final response = await http.put(
-          Uri.parse(_apiUrl),
+          url,
           headers: {'Content-Type': 'application/json'},
           body: json.encode(animalModificado.toMap()),
         );
@@ -483,8 +483,9 @@ class _RegistroPageState extends State<RegistroPage> {
                 final dialogContext = context;
 
                 try {
+                  final url = Uri.parse(getApiUrl('animales'));
                   final response = await http.delete(
-                    Uri.parse(_apiUrl),
+                    url,
                     headers: {'Content-Type': 'application/json'},
                     body: json.encode({'id': _animalSeleccionado!.id}),
                   );
