@@ -6,7 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
 
 class PdfServicet {
-  // Método para formatear fecha desde BD
+  // Aqui ponemos el formato de la fecha
   String _formatearFechaDesdeBD(String fechaBD) {
     try {
       if (fechaBD.contains(' ')) {
@@ -26,16 +26,16 @@ class PdfServicet {
     }
   }
 
-  // Generar PDF y obtener bytes
+  // Aqui generamos el pdf y obtenemos los bytes
   Future<Uint8List> generarPdfBytes(List<dynamic> registros) async {
     final pdf = pw.Document();
 
     pdf.addPage(
       pw.MultiPage(
-        pageFormat: PdfPageFormat.a4.landscape, // Formato horizontal para más espacio
+        pageFormat: PdfPageFormat.a4.landscape,
         build: (pw.Context context) {
           return [
-            // Encabezado
+            // Aqui ponemos el encabezado de la hoja
             pw.Header(
               level: 0,
               child: pw.Text(
@@ -49,7 +49,7 @@ class PdfServicet {
             ),
             pw.SizedBox(height: 15),
             
-            // Información del reporte
+            // Aqui ponemos la informacion del reporte
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               children: [
@@ -66,23 +66,23 @@ class PdfServicet {
             ),
             pw.SizedBox(height: 15),
 
-            // Tabla de vacunaciones - Mismo diseño que la lista
+            // Aqui ponemos la tabla de las vacunaciones
             pw.Table(
               border: pw.TableBorder.all(color: PdfColors.black, width: 1),
               columnWidths: {
                 0: pw.FlexColumnWidth(2), // N° Arete
                 1: pw.FlexColumnWidth(2), // Fecha Vac.
-                2: pw.FlexColumnWidth(2), // Vacuna
+                2: pw.FlexColumnWidth(2), // Medicamento
                 3: pw.FlexColumnWidth(2), // Vía Admin.
                 4: pw.FlexColumnWidth(1), // Dosis
-                5: pw.FlexColumnWidth(2), // Aplicador
+                5: pw.FlexColumnWidth(2), // Trabajador
                 6: pw.FlexColumnWidth(2), // Próxima Vac.
                 7: pw.FlexColumnWidth(2), // Observaciones
               },
               children: [
-                // Encabezado de la tabla (estilo azul grisáceo)
+                // // Aqui ponemos los datos del encabezado
                 pw.TableRow(
-                  decoration: pw.BoxDecoration(color: PdfColor.fromInt(0xFF37474F)), // Azul grisáceo oscuro
+                  decoration: pw.BoxDecoration(color: PdfColor.fromInt(0xFF37474F)), 
                   children: [
                     pw.Padding(
                       padding: pw.EdgeInsets.all(8),
@@ -106,7 +106,7 @@ class PdfServicet {
                     ),
                     pw.Padding(
                       padding: pw.EdgeInsets.all(8),
-                      child: pw.Text('VACUNA',
+                      child: pw.Text('MEDICAMENTO', 
                           style: pw.TextStyle(
                             color: PdfColors.white,
                             fontWeight: pw.FontWeight.bold,
@@ -136,7 +136,7 @@ class PdfServicet {
                     ),
                     pw.Padding(
                       padding: pw.EdgeInsets.all(8),
-                      child: pw.Text('APLICADOR',
+                      child: pw.Text('TRABAJADOR', 
                           style: pw.TextStyle(
                             color: PdfColors.white,
                             fontWeight: pw.FontWeight.bold,
@@ -166,14 +166,12 @@ class PdfServicet {
                     ),
                   ],
                 ),
-                
-                // Filas de datos
                 ...registros.asMap().entries.map((entry) {
                   final index = entry.key;
                   final registro = entry.value;
                   final bgColor = index.isEven 
-                      ? PdfColor.fromInt(0xFFFAFAFA) // Gris muy claro para filas pares
-                      : PdfColors.white; // Blanco para filas impares
+                      ? PdfColor.fromInt(0xFFFAFAFA) 
+                      : PdfColors.white; 
                   
                   return pw.TableRow(
                     decoration: pw.BoxDecoration(color: bgColor),
@@ -197,7 +195,7 @@ class PdfServicet {
                       pw.Padding(
                         padding: pw.EdgeInsets.all(6),
                         child: pw.Text(
-                          registro['vacuna_aplicada']?.toString() ?? 'N/A',
+                          registro['vacuna_aplicada']?.toString() ?? 'N/A', 
                           style: pw.TextStyle(fontSize: 9),
                           textAlign: pw.TextAlign.center,
                         ),
@@ -205,7 +203,7 @@ class PdfServicet {
                       pw.Padding(
                         padding: pw.EdgeInsets.all(6),
                         child: pw.Text(
-                          registro['via_administracion']?.toString() ?? 'N/A',
+                          registro['via_administracion']?.toString() ?? 'N/A', 
                           style: pw.TextStyle(fontSize: 9),
                           textAlign: pw.TextAlign.center,
                         ),
@@ -221,7 +219,7 @@ class PdfServicet {
                       pw.Padding(
                         padding: pw.EdgeInsets.all(6),
                         child: pw.Text(
-                          registro['aplicador']?.toString() ?? 'N/A',
+                          registro['aplicador']?.toString() ?? 'N/A', 
                           style: pw.TextStyle(fontSize: 9),
                           textAlign: pw.TextAlign.center,
                         ),
@@ -258,13 +256,13 @@ class PdfServicet {
     return pdf.save();
   }
 
-  // Guardar PDF en dispositivo y abrirlo
+  // Aqui guardamos el pdf y lo abrimos
   Future<void> guardarYAbrirPdf(List<dynamic> registros, String fileName) async {
     try {
-      // Generar bytes del PDF
+      // Aqui generamos los bytes del pdf
       final bytes = await generarPdfBytes(registros);
       
-      // Obtener directorio de descargas
+      // Aqui agregamos el directorio de descargas
       final directory = await getExternalStorageDirectory();
       final path = directory?.path;
       
@@ -272,20 +270,19 @@ class PdfServicet {
         throw Exception('No se pudo acceder al almacenamiento');
       }
       
-      // Crear archivo
+      // Aqui creamos el archivo
       final file = File('$path/$fileName.pdf');
       await file.writeAsBytes(bytes);
       
-      // Abrir archivo usando open_file package :cite[3]:cite[7]
+      // Aqui abrimos el archivo
       await OpenFile.open(file.path);
       
     } catch (e) {
-      // Si falla con almacenamiento externo, intentar con documentos
       await guardarPdfEnDocumentos(registros, fileName);
     }
   }
 
-  // Alternativa para guardar en directorio de documentos
+  // Aqui agregamos una opcion para guardar en documentos
   Future<void> guardarPdfEnDocumentos(List<dynamic> registros, String fileName) async {
     try {
       final bytes = await generarPdfBytes(registros);
@@ -293,7 +290,7 @@ class PdfServicet {
       final file = File('${directory.path}/$fileName.pdf');
       await file.writeAsBytes(bytes);
       
-      // Abrir archivo usando open_file package :cite[3]:cite[7]
+      // Abrir archivo
       await OpenFile.open(file.path);
     } catch (e) {
       throw Exception('Error al guardar PDF: $e');

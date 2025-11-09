@@ -12241,6 +12241,7 @@ com.crazecoder.openfile.utils.MapUtil:
 com.example.ganabo.R$drawable
 com.example.ganabo.R$mipmap
 com.example.ganabo.R$style
+com.example.ganabo.R$xml
 com.example.ganabo.R
 com.getkeepsafe.relinker.ApkLibraryInstaller:
     private static final int COPY_BUFFER_SIZE

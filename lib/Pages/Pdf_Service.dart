@@ -6,7 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
 
 class PdfService {
-  // Método para formatear fecha desde BD
+  // Aqui ponemos el formato de la fecha
   String _formatearFechaDesdeBD(String fechaBD) {
     try {
       if (fechaBD.contains(' ')) {
@@ -26,7 +26,7 @@ class PdfService {
     }
   }
 
-  // Generar PDF y obtener bytes
+  // Aqui generamos el pdf y obtenemos los bytes
   Future<Uint8List> generarPdfBytes(List<dynamic> pesajes) async {
     final pdf = pw.Document();
 
@@ -35,7 +35,7 @@ class PdfService {
         pageFormat: PdfPageFormat.a4,
         build: (pw.Context context) {
           return [
-            // Encabezado
+            // Aqui ponemos el encabezado de la hoja
             pw.Header(
               level: 0,
               child: pw.Text(
@@ -48,7 +48,7 @@ class PdfService {
             ),
             pw.SizedBox(height: 20),
             
-            // Información del reporte
+            // Aqui ponemos la informacion del reporte
             pw.Row(
               children: [
                 pw.Text('Fecha de generación: '),
@@ -63,7 +63,7 @@ class PdfService {
             ),
             pw.SizedBox(height: 20),
 
-            // Tabla de pesajes
+            // Aqui ponemos la tabla de los pesajes
             pw.TableHelper.fromTextArray(
               context: context,
               border: pw.TableBorder.all(),
@@ -72,13 +72,14 @@ class PdfService {
               cellAlignment: pw.Alignment.centerLeft,
               headerAlignment: pw.Alignment.center,
               data: [
-                ['Arete', 'Fecha', 'Peso (kg)', 'Ubicación', 'Persona', 'Observaciones'],
+                // Aqui ponemos los datos del encabezado
+                ['Arete', 'Fecha', 'Peso (kg)', 'Rancho', 'Trabajador', 'Observaciones'],
                 ...pesajes.map((pesaje) => [
                   pesaje['numero_arete']?.toString() ?? 'N/A',
                   _formatearFechaDesdeBD(pesaje['fecha_pesaje']?.toString() ?? 'N/A'),
                   pesaje['peso']?.toString() ?? 'N/A',
-                  pesaje['ubicacion_direccion']?.toString() ?? 'N/A',
-                  pesaje['persona_cargo']?.toString() ?? 'N/A',
+                  pesaje['ubicacion_direccion']?.toString() ?? 'N/A', 
+                  pesaje['persona_cargo']?.toString() ?? 'N/A', 
                   pesaje['observaciones']?.toString() ?? 'N/A',
                 ]).toList(),
               ],
@@ -91,13 +92,13 @@ class PdfService {
     return pdf.save();
   }
 
-  // Guardar PDF en dispositivo y abrirlo
+  // Aqui guardamos el pdf y lo abrimos
   Future<void> guardarYAbrirPdf(List<dynamic> pesajes, String fileName) async {
     try {
-      // Generar bytes del PDF
+      // Aqui generamos los bytes del pdf
       final bytes = await generarPdfBytes(pesajes);
       
-      // Obtener directorio de descargas
+      // Aqui agregamos el directorio de descargas
       final directory = await getExternalStorageDirectory();
       final path = directory?.path;
       
@@ -105,11 +106,11 @@ class PdfService {
         throw Exception('No se pudo acceder al almacenamiento');
       }
       
-      // Crear archivo
+      // Aqui creamos el archivo
       final file = File('$path/$fileName.pdf');
       await file.writeAsBytes(bytes);
       
-      // Abrir archivo
+      // Aqui abrimos el archivo
       await OpenFile.open(file.path);
       
     } catch (e) {
@@ -117,7 +118,7 @@ class PdfService {
     }
   }
 
-  // Alternativa para guardar en directorio de documentos
+  // Aqui agregamos una opcion para guardar en documentos
   Future<void> guardarPdfEnDocumentos(List<dynamic> pesajes, String fileName) async {
     try {
       final bytes = await generarPdfBytes(pesajes);

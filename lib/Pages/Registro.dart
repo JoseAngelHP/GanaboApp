@@ -3,21 +3,16 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-import 'package:flutter/foundation.dart'; // ← AÑADE ESTA IMPORTACIÓN
+import 'package:flutter/foundation.dart';
 
-// ← AÑADE ESTA FUNCIÓN FUERA DE LA CLASE
 String getApiUrl(String endpoint) {
-  // Para WEB: Usar HTTPS
   if (kIsWeb) {
     return 'https://ganabovino.atwebpages.com/api/$endpoint.php';
-  }
-  // Para MÓVIL: Usar HTTP
-  else {
+  } else {
     return 'http://ganabovino.atwebpages.com/api/$endpoint.php';
   }
 }
 
-// Modelo de datos para el ganado
 class Animal {
   int? id;
   String numeroArete;
@@ -25,8 +20,9 @@ class Animal {
   String sexo;
   String fechaNacimiento;
   String origen;
-  String padre;
-  String madre;
+  String? padre;
+  String? madre;
+  String? adquisicion; 
   String? fotoPath;
 
   Animal({
@@ -36,8 +32,9 @@ class Animal {
     required this.sexo,
     required this.fechaNacimiento,
     required this.origen,
-    required this.padre,
-    required this.madre,
+    this.padre,
+    this.madre,
+    this.adquisicion, 
     this.fotoPath,
   });
 
@@ -49,8 +46,9 @@ class Animal {
       'sexo': sexo,
       'fecha_nacimiento': fechaNacimiento,
       'origen': origen,
-      'padre': padre,
-      'madre': madre,
+      'padre': padre ?? '',
+      'madre': madre ?? '',
+      'adquisicion': adquisicion ?? '', 
       'foto_path': fotoPath,
     };
   }
@@ -63,8 +61,12 @@ class Animal {
       sexo: map['sexo'],
       fechaNacimiento: map['fecha_nacimiento'],
       origen: map['origen'],
-      padre: map['padre'],
-      madre: map['madre'],
+      padre: map['padre']?.isEmpty ?? true ? null : map['padre'],
+      madre: map['madre']?.isEmpty ?? true ? null : map['madre'],
+      adquisicion:
+          map['adquisicion']?.isEmpty ?? true
+              ? null
+              : map['adquisicion'], 
       fotoPath: map['foto_path'],
     );
   }
@@ -82,6 +84,8 @@ class _RegistroPageState extends State<RegistroPage> {
   final TextEditingController _numeroAreteController = TextEditingController();
   final TextEditingController _fechaNacimientoController =
       TextEditingController();
+  final TextEditingController _adquisicionController =
+      TextEditingController(); 
 
   String? _selectedRaza;
   String? _selectedSexo;
@@ -92,10 +96,14 @@ class _RegistroPageState extends State<RegistroPage> {
   File? _foto;
   final ImagePicker _picker = ImagePicker();
 
-  // Lista para almacenar los animales registrados
   List<Animal> _animales = [];
-  // Animal seleccionado para modificar
   Animal? _animalSeleccionado;
+
+  List<String> _numerosAretePadres = [];
+  List<String> _numerosAreteMadres = [];
+
+  List<String> _padresTemporales = [];
+  List<String> _madresTemporales = [];
 
   Future<void> _cargarRazasDesdeBD() async {
     try {
@@ -103,22 +111,15 @@ class _RegistroPageState extends State<RegistroPage> {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        // DEBUG: Imprime la respuesta para verificar
-        print('Respuesta del servidor: ${response.body}');
-
         List<dynamic> data = json.decode(response.body);
         setState(() {
           _razas = data.cast<String>();
         });
-
-        // DEBUG: Imprime las razas cargadas
-        print('Razas cargadas: $_razas');
       } else {
         print('Error del servidor: ${response.statusCode}');
       }
     } catch (e) {
       print('Error de conexión: $e');
-      // Si hay error, usa lista estática como respaldo
       setState(() {
         _razas = [
           'Angus',
@@ -144,22 +145,15 @@ class _RegistroPageState extends State<RegistroPage> {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        // DEBUG: Imprime la respuesta para verificar
-        print('Respuesta del servidor: ${response.body}');
-
         List<dynamic> data = json.decode(response.body);
         setState(() {
           _origenes = data.cast<String>();
         });
-
-        // DEBUG: Imprime las razas cargadas
-        print('Origenes cargados: $_origenes');
       } else {
         print('Error del servidor: ${response.statusCode}');
       }
     } catch (e) {
       print('Error de conexión: $e');
-      // Si hay error, usa lista estática como respaldo
       setState(() {
         _origenes = ['Compra', 'Nacimiento en la finca', 'Donación', 'Trueque'];
       });
@@ -168,77 +162,51 @@ class _RegistroPageState extends State<RegistroPage> {
 
   List<String> _origenes = [];
 
-  Future<void> _cargarPadresDesdeBD() async {
-    try {
-      final url = Uri.parse(getApiUrl('todostr'));
-      final response = await http.get(url);
+  void _cargarNumerosAreteParaPadres() {
+    List<String> padres =
+        _animales
+            .where((animal) => animal.sexo == 'Macho')
+            .map((animal) => animal.numeroArete)
+            .toList();
 
-      if (response.statusCode == 200) {
-        // DEBUG: Imprime la respuesta para verificar
-        print('Respuesta del servidor: ${response.body}');
-
-        List<dynamic> data = json.decode(response.body);
-        setState(() {
-          _padres = data.cast<String>();
-        });
-
-        // DEBUG: Imprime las razas cargadas
-        print('Padres cargados: $_padres');
-      } else {
-        print('Error del servidor: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error de conexión: $e');
-      // Si hay error, usa lista estática como respaldo
-      setState(() {
-        _padres = [
-          'Toro 001 - Angus',
-          'Toro 002 - Hereford',
-          'Toro 003 - Brahman',
-          'Toro 004 - Simmental',
-          'Desconocido',
-        ];
-      });
-    }
+    setState(() {
+      _numerosAretePadres = padres;
+    });
   }
 
-  List<String> _padres = [];
+  void _cargarNumerosAreteParaMadres() {
+    List<String> madres =
+        _animales
+            .where((animal) => animal.sexo == 'Hembra')
+            .map((animal) => animal.numeroArete)
+            .toList();
 
-  Future<void> _cargarMadresDesdeBD() async {
-    try {
-      final url = Uri.parse(getApiUrl('todosfo'));
-      final response = await http.get(url);
-
-      if (response.statusCode == 200) {
-        // DEBUG: Imprime la respuesta para verificar
-        print('Respuesta del servidor: ${response.body}');
-
-        List<dynamic> data = json.decode(response.body);
-        setState(() {
-          _madres = data.cast<String>();
-        });
-
-        // DEBUG: Imprime las razas cargadas
-        print('Madres cargadas: $_madres');
-      } else {
-        print('Error del servidor: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error de conexión: $e');
-      // Si hay error, usa lista estática como respaldo
-      setState(() {
-        _madres = [
-          'Vaca 001 - Angus',
-          'Vaca 002 - Hereford',
-          'Vaca 003 - Brahman',
-          'Vaca 004 - Simmental',
-          'Desconocida',
-        ];
-      });
-    }
+    setState(() {
+      _numerosAreteMadres = madres;
+    });
   }
 
-  List<String> _madres = [];
+  // Aqui mandamos a llamar a la lista de los padres 
+  List<String> _obtenerPadresCompletos() {
+    Set<String> padresCompletos = {};
+    padresCompletos.addAll(_numerosAretePadres);
+    padresCompletos.addAll(_padresTemporales);
+    if (_selectedPadre != null && _selectedPadre!.isNotEmpty) {
+      padresCompletos.add(_selectedPadre!);
+    }
+    return padresCompletos.toList();
+  }
+
+  // Aqui mandamos a llamar a la lista de las madres 
+  List<String> _obtenerMadresCompletas() {
+    Set<String> madresCompletas = {};
+    madresCompletas.addAll(_numerosAreteMadres);
+    madresCompletas.addAll(_madresTemporales);
+    if (_selectedMadre != null && _selectedMadre!.isNotEmpty) {
+      madresCompletas.add(_selectedMadre!);
+    }
+    return madresCompletas.toList();
+  }
 
   @override
   void initState() {
@@ -246,11 +214,8 @@ class _RegistroPageState extends State<RegistroPage> {
     _cargarAnimales();
     _cargarRazasDesdeBD();
     _cargarOrigenesDesdeBD();
-    _cargarPadresDesdeBD();
-    _cargarMadresDesdeBD();
   }
 
-  // Cargar todos los animales desde la API
   Future<void> _cargarAnimales() async {
     try {
       final url = Uri.parse(getApiUrl('animales'));
@@ -260,6 +225,8 @@ class _RegistroPageState extends State<RegistroPage> {
         List<dynamic> data = json.decode(response.body);
         setState(() {
           _animales = data.map((item) => Animal.fromMap(item)).toList();
+          _cargarNumerosAreteParaPadres();
+          _cargarNumerosAreteParaMadres();
         });
       } else {
         throw Exception('Error al cargar los animales');
@@ -307,7 +274,7 @@ class _RegistroPageState extends State<RegistroPage> {
                 Navigator.of(context).pop();
                 _seleccionarFoto();
               },
-              child: const Text('Galería')
+              child: const Text('Galería'),
             ),
           ],
         );
@@ -315,7 +282,6 @@ class _RegistroPageState extends State<RegistroPage> {
     );
   }
 
-  // AGREGAR - Insertar nuevo animal
   Future<void> _agregarAnimal() async {
     if (_formKey.currentState!.validate()) {
       try {
@@ -325,8 +291,12 @@ class _RegistroPageState extends State<RegistroPage> {
           sexo: _selectedSexo!,
           fechaNacimiento: _fechaNacimientoController.text,
           origen: _selectedOrigen!,
-          padre: _selectedPadre!,
-          madre: _selectedMadre!,
+          padre: _selectedPadre,
+          madre: _selectedMadre,
+          adquisicion:
+              _adquisicionController.text.isNotEmpty
+                  ? _adquisicionController.text
+                  : null, 
           fotoPath: _foto?.path,
         );
 
@@ -354,7 +324,6 @@ class _RegistroPageState extends State<RegistroPage> {
     }
   }
 
-  // CONSULTAR - Buscar animal por número de arete
   Future<void> _consultarAnimal() async {
     String numeroArete = _numeroAreteController.text.trim();
 
@@ -368,7 +337,9 @@ class _RegistroPageState extends State<RegistroPage> {
     }
 
     try {
-      final url = Uri.parse("${getApiUrl('animales')}?numero_arete=$numeroArete");
+      final url = Uri.parse(
+        "${getApiUrl('animales')}?numero_arete=$numeroArete",
+      );
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -376,6 +347,20 @@ class _RegistroPageState extends State<RegistroPage> {
 
         if (data.isNotEmpty) {
           Animal animal = Animal.fromMap(data[0]);
+
+          // Aqui verificamos si los valores de padre/madre existen en la lista
+          if (animal.padre != null &&
+              animal.padre!.isNotEmpty &&
+              !_numerosAretePadres.contains(animal.padre)) {
+            _padresTemporales.add(animal.padre!);
+          }
+
+          if (animal.madre != null &&
+              animal.madre!.isNotEmpty &&
+              !_numerosAreteMadres.contains(animal.madre)) {
+            _madresTemporales.add(animal.madre!);
+          }
+
           setState(() {
             _animalSeleccionado = animal;
             _numeroAreteController.text = animal.numeroArete;
@@ -385,8 +370,9 @@ class _RegistroPageState extends State<RegistroPage> {
             _selectedOrigen = animal.origen;
             _selectedPadre = animal.padre;
             _selectedMadre = animal.madre;
+            _adquisicionController.text =
+                animal.adquisicion ?? ''; 
 
-            // CARGAR LA IMAGEN DESDE LA RUTA ALMACENADA
             if (animal.fotoPath != null && animal.fotoPath!.isNotEmpty) {
               _foto = File(animal.fotoPath!);
             } else {
@@ -410,7 +396,6 @@ class _RegistroPageState extends State<RegistroPage> {
     }
   }
 
-  // MODIFICAR - Actualizar animal existente
   Future<void> _modificarAnimal() async {
     if (_animalSeleccionado == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -430,8 +415,12 @@ class _RegistroPageState extends State<RegistroPage> {
           sexo: _selectedSexo!,
           fechaNacimiento: _fechaNacimientoController.text,
           origen: _selectedOrigen!,
-          padre: _selectedPadre!,
-          madre: _selectedMadre!,
+          padre: _selectedPadre,
+          madre: _selectedMadre,
+          adquisicion:
+              _adquisicionController.text.isNotEmpty
+                  ? _adquisicionController.text
+                  : null, 
           fotoPath: _foto?.path,
         );
 
@@ -460,7 +449,6 @@ class _RegistroPageState extends State<RegistroPage> {
     }
   }
 
-  // ELIMINAR - Borrar animal
   Future<void> _eliminarAnimal() async {
     if (_animalSeleccionado == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -486,7 +474,6 @@ class _RegistroPageState extends State<RegistroPage> {
             ),
             TextButton(
               onPressed: () async {
-                // Guardar el contexto del diálogo antes de cerrarlo
                 final dialogContext = context;
 
                 try {
@@ -497,11 +484,9 @@ class _RegistroPageState extends State<RegistroPage> {
                     body: json.encode({'id': _animalSeleccionado!.id}),
                   );
 
-                  // Cerrar el diálogo
                   Navigator.of(dialogContext).pop();
 
                   if (response.statusCode == 200) {
-                    // Verificar si el widget todavía está montado antes de actualizar
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
@@ -522,7 +507,6 @@ class _RegistroPageState extends State<RegistroPage> {
                     }
                   }
                 } catch (e) {
-                  // Cerrar el diálogo en caso de error
                   Navigator.of(dialogContext).pop();
 
                   if (mounted) {
@@ -549,13 +533,15 @@ class _RegistroPageState extends State<RegistroPage> {
       _selectedOrigen = null;
       _selectedPadre = null;
       _selectedMadre = null;
+      _adquisicionController.clear(); 
       _foto = null;
       _animalSeleccionado = null;
+      _padresTemporales.clear();
+      _madresTemporales.clear();
     });
   }
 
   void _verListaAnimales() {
-    // Navegar a una nueva pantalla en lugar de mostrar diálogo
     Navigator.of(context).push(
       MaterialPageRoute(
         builder:
@@ -573,7 +559,6 @@ class _RegistroPageState extends State<RegistroPage> {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
-                    // Encabezados de la tabla
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.blueGrey[800],
@@ -636,7 +621,7 @@ class _RegistroPageState extends State<RegistroPage> {
                           Expanded(
                             flex: 2,
                             child: Text(
-                              'ORIGEN',
+                              'RANCHO',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
@@ -670,6 +655,18 @@ class _RegistroPageState extends State<RegistroPage> {
                             ),
                           ),
                           Expanded(
+                            flex: 2,
+                            child: Text(
+                              'ADQUISICION',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                fontSize: 14,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Expanded(
                             flex: 1,
                             child: Text(
                               'FOTO',
@@ -686,7 +683,6 @@ class _RegistroPageState extends State<RegistroPage> {
                     ),
                     const SizedBox(height: 10),
 
-                    // Contenido de la tabla
                     Expanded(
                       child:
                           _animales.isEmpty
@@ -721,7 +717,6 @@ class _RegistroPageState extends State<RegistroPage> {
                                     ),
                                     child: Row(
                                       children: [
-                                        // N° Arete
                                         Expanded(
                                           flex: 2,
                                           child: Text(
@@ -733,7 +728,6 @@ class _RegistroPageState extends State<RegistroPage> {
                                             ),
                                           ),
                                         ),
-                                        // Raza
                                         Expanded(
                                           flex: 2,
                                           child: Text(
@@ -744,7 +738,6 @@ class _RegistroPageState extends State<RegistroPage> {
                                             ),
                                           ),
                                         ),
-                                        // Sexo
                                         Expanded(
                                           flex: 2,
                                           child: Text(
@@ -755,7 +748,6 @@ class _RegistroPageState extends State<RegistroPage> {
                                             ),
                                           ),
                                         ),
-                                        // Fecha Nacimiento
                                         Expanded(
                                           flex: 3,
                                           child: Text(
@@ -766,7 +758,6 @@ class _RegistroPageState extends State<RegistroPage> {
                                             ),
                                           ),
                                         ),
-                                        // Origen
                                         Expanded(
                                           flex: 2,
                                           child: Text(
@@ -777,29 +768,36 @@ class _RegistroPageState extends State<RegistroPage> {
                                             ),
                                           ),
                                         ),
-                                        // Padre
                                         Expanded(
                                           flex: 2,
                                           child: Text(
-                                            animal.padre,
+                                            animal.padre ?? '',
                                             textAlign: TextAlign.center,
                                             style: const TextStyle(
                                               fontSize: 13,
                                             ),
                                           ),
                                         ),
-                                        // Madre
                                         Expanded(
                                           flex: 2,
                                           child: Text(
-                                            animal.madre,
+                                            animal.madre ?? '',
                                             textAlign: TextAlign.center,
                                             style: const TextStyle(
                                               fontSize: 13,
                                             ),
                                           ),
                                         ),
-                                        // Foto
+                                        Expanded(
+                                          flex: 2,
+                                          child: Text(
+                                            animal.adquisicion ?? '',
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                        ),
                                         Expanded(
                                           flex: 1,
                                           child: Center(
@@ -822,7 +820,6 @@ class _RegistroPageState extends State<RegistroPage> {
     );
   }
 
-  // Función auxiliar para mostrar la imagen en la tabla
   Widget _buildTableImageWidget(String? fotoPath) {
     if (fotoPath != null && fotoPath.isNotEmpty) {
       try {
@@ -868,7 +865,7 @@ class _RegistroPageState extends State<RegistroPage> {
               ),
               const SizedBox(height: 20),
 
-              // Número de arete
+              // Aqui ponemos el Número de arete
               TextFormField(
                 controller: _numeroAreteController,
                 decoration: const InputDecoration(
@@ -886,7 +883,7 @@ class _RegistroPageState extends State<RegistroPage> {
               ),
               const SizedBox(height: 16),
 
-              // Raza (dropdown)
+              // Aqui ponemos la Raza 
               DropdownButtonFormField<String>(
                 value: _selectedRaza,
                 decoration: const InputDecoration(
@@ -916,7 +913,7 @@ class _RegistroPageState extends State<RegistroPage> {
               ),
               const SizedBox(height: 16),
 
-              // Sexo (dropdown)
+              // Aqui ponemos el Sexo 
               DropdownButtonFormField<String>(
                 value: _selectedSexo,
                 decoration: const InputDecoration(
@@ -946,7 +943,7 @@ class _RegistroPageState extends State<RegistroPage> {
               ),
               const SizedBox(height: 16),
 
-              // Fecha de Nacimiento
+              // Aqui ponemos la Fecha de Nacimiento
               TextFormField(
                 controller: _fechaNacimientoController,
                 decoration: const InputDecoration(
@@ -981,11 +978,11 @@ class _RegistroPageState extends State<RegistroPage> {
               ),
               const SizedBox(height: 16),
 
-              // Origen (dropdown)
+              // Aqui ponemos el Rancho
               DropdownButtonFormField<String>(
                 value: _selectedOrigen,
                 decoration: const InputDecoration(
-                  labelText: 'Origen',
+                  labelText: 'Rancho',
                   border: OutlineInputBorder(),
                   filled: true,
                   fillColor: Colors.white,
@@ -1011,17 +1008,17 @@ class _RegistroPageState extends State<RegistroPage> {
               ),
               const SizedBox(height: 16),
 
-              // Padre (dropdown)
+              // Aqui ponemos el Padre 
               DropdownButtonFormField<String>(
                 value: _selectedPadre,
                 decoration: const InputDecoration(
-                  labelText: 'Padre',
+                  labelText: 'Padre (Opcional)',
                   border: OutlineInputBorder(),
                   filled: true,
                   fillColor: Colors.white,
                 ),
                 items:
-                    _padres.map((String value) {
+                    _obtenerPadresCompletos().map((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
                         child: Text(value),
@@ -1032,26 +1029,20 @@ class _RegistroPageState extends State<RegistroPage> {
                     _selectedPadre = newValue;
                   });
                 },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor seleccione el padre';
-                  }
-                  return null;
-                },
               ),
               const SizedBox(height: 16),
 
-              // Madre (dropdown)
+              // Aqui ponemos la Madre 
               DropdownButtonFormField<String>(
                 value: _selectedMadre,
                 decoration: const InputDecoration(
-                  labelText: 'Madre',
+                  labelText: 'Madre (Opcional)',
                   border: OutlineInputBorder(),
                   filled: true,
                   fillColor: Colors.white,
                 ),
                 items:
-                    _madres.map((String value) {
+                    _obtenerMadresCompletas().map((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
                         child: Text(value),
@@ -1062,16 +1053,21 @@ class _RegistroPageState extends State<RegistroPage> {
                     _selectedMadre = newValue;
                   });
                 },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor seleccione la madre';
-                  }
-                  return null;
-                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _adquisicionController,
+                decoration: const InputDecoration(
+                  labelText: 'Adquisicion (Opcional)',
+                  border: OutlineInputBorder(),
+                  filled: true,
+                  fillColor: Colors.white,
+                  hintText: 'Ej: Compra, Trueque, Donacion...',
+                ),
               ),
               const SizedBox(height: 16),
 
-              // Insertar Foto
+              // Aqui Insertamos la Foto
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1102,13 +1098,10 @@ class _RegistroPageState extends State<RegistroPage> {
                 ],
               ),
               const SizedBox(height: 30),
-
-              // Botones de operaciones CRUD
               Wrap(
                 spacing: 10,
                 runSpacing: 10,
                 children: [
-                  // Botón Agregar
                   ElevatedButton(
                     onPressed: _agregarAnimal,
                     style: ElevatedButton.styleFrom(
@@ -1119,8 +1112,6 @@ class _RegistroPageState extends State<RegistroPage> {
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
-
-                  // Botón Consultar
                   ElevatedButton(
                     onPressed: _consultarAnimal,
                     style: ElevatedButton.styleFrom(
@@ -1131,8 +1122,6 @@ class _RegistroPageState extends State<RegistroPage> {
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
-
-                  // Botón Modificar
                   ElevatedButton(
                     onPressed: _modificarAnimal,
                     style: ElevatedButton.styleFrom(
@@ -1143,8 +1132,6 @@ class _RegistroPageState extends State<RegistroPage> {
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
-
-                  // Botón Eliminar
                   ElevatedButton(
                     onPressed: _eliminarAnimal,
                     style: ElevatedButton.styleFrom(
@@ -1155,8 +1142,6 @@ class _RegistroPageState extends State<RegistroPage> {
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
-
-                  // Botón Limpiar
                   ElevatedButton(
                     onPressed: _limpiarCampos,
                     style: ElevatedButton.styleFrom(
@@ -1167,8 +1152,6 @@ class _RegistroPageState extends State<RegistroPage> {
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
-
-                  // Botón Ver Lista
                   ElevatedButton(
                     onPressed: _verListaAnimales,
                     style: ElevatedButton.styleFrom(

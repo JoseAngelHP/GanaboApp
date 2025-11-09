@@ -19,7 +19,7 @@ class MainApp extends StatelessWidget {
       routes: {
         'Login': (_) => LoginPage(), 
         'Signup': (_) => SignUpPage(),
-        'Home': (_) => InicioPage(), // Agrega esta ruta
+        'Home': (_) => InicioPage(), 
         },
     );
   }

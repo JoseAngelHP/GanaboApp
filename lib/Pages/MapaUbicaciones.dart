@@ -34,7 +34,6 @@ class _MapaUbicacionesState extends State<MapaUbicaciones> {
           height: 500,
           child: Column(
             children: [
-              // Mapa para selección visual
               Container(
                 height: 300,
                 child: GoogleMap(
@@ -50,7 +49,7 @@ class _MapaUbicacionesState extends State<MapaUbicaciones> {
               ),
               SizedBox(height: 10),
               
-              // Campos para coordenadas manuales
+              // Aqui agregamos los campos para la latitud y longitud
               Row(
                 children: [
                   Expanded(
@@ -82,7 +81,7 @@ class _MapaUbicacionesState extends State<MapaUbicaciones> {
               ),
               SizedBox(height: 10),
               
-              // Botón para obtener dirección
+              // Aqui agregamos el boton para obtener la direccion
               ElevatedButton(
                 onPressed: _obtenerDireccionDesdeCoordenadas,
                 style: ElevatedButton.styleFrom(
@@ -125,8 +124,6 @@ class _MapaUbicacionesState extends State<MapaUbicaciones> {
       setState(() {
         _ubicacionSeleccionada = LatLng(lat, lng);
       });
-      
-      // Mover el mapa a las nuevas coordenadas
       _mapController?.animateCamera(
         CameraUpdate.newLatLng(LatLng(lat, lng)),
       );
@@ -232,7 +229,7 @@ class _MapaUbicacionesState extends State<MapaUbicaciones> {
                 labelText: "Ubicación seleccionada",
                 border: OutlineInputBorder(),
               ),
-              readOnly: true,  // ✅ CORRECTO
+              readOnly: true, 
             ),
             SizedBox(height: 20),
             ElevatedButton.icon(

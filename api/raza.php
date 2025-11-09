@@ -4,29 +4,25 @@ header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-// Configuración de la base de datos
-$servername = "fdb1033.awardspace.net";
-$username = "4685324_ganabo"; // Cambiar por tu usuario de MySQL
-$password = "Angelito123"; // Cambiar por tu contraseña de MySQL
-$dbname = "4685324_ganabo";
+$servername = "fdb1033.awardspace.net";//Aqui ponemos el servidor de la base de datos
+$username = "4685324_ganabo"; //Aqui ponemos el usuario de la base de datos
+$password = "Angelito123"; //Aqui ponemos la contraseña de la base de datos
+$dbname = "4685324_ganabo";//Aqui ponemos el nombre de la base de datos
 
-// Crear conexión
+// Aqui creamos la conexión
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Verificar conexión
+// Aqui verificamos la conexión
 if ($conn->connect_error) {
     die(json_encode(array("message" => "Connection failed: " . $conn->connect_error)));
 }
 
-// Obtener el método de la solicitud
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Procesar según el método
 switch ($method) {
     case 'GET':
-        // Consultar registros
+         // Aqui consultamos los datos de raza
         if (isset($_GET['numero_arete'])) {
-            // Consultar por número de arete
             $numero_arete = $_GET['numero_arete'];
             $sql = "SELECT * FROM raza WHERE numero_arete = ?";
             $stmt = $conn->prepare($sql);
@@ -42,7 +38,6 @@ switch ($method) {
                 echo json_encode(array("message" => "No se encontró la raza con arete: " . $numero_arete));
             }
         } else {
-            // Consultar todos los registros
             $sql = "SELECT * FROM raza ORDER BY numero_arete DESC";
             $result = $conn->query($sql);
             
@@ -57,10 +52,9 @@ switch ($method) {
         break;
         
     case 'POST':
-        // Crear nuevo registro
+        // Aqui creamos una raza
         $data = json_decode(file_get_contents("php://input"), true);
         
-        // Validar campos requeridos
         if (!isset($data['numero_arete']) || !isset($data['nombre_raza'])) {
             http_response_code(400);
             echo json_encode(array("message" => "Los campos numero_arete y nombre_raza son requeridos"));
@@ -74,7 +68,6 @@ switch ($method) {
         $nombre_raza = $data['nombre_raza'];
         $altura = isset($data['altura']) ? $data['altura'] : null;
         
-        // Verificar si ya existe el número de arete
         $sql_check = "SELECT id FROM raza WHERE numero_arete = ?";
         $stmt_check = $conn->prepare($sql_check);
         $stmt_check->bind_param("s", $numero_arete);
@@ -106,10 +99,9 @@ switch ($method) {
         break;
         
     case 'PUT':
-        // Actualizar registro existente por número de arete
+        // Aqui actualizamos la raza
         $data = json_decode(file_get_contents("php://input"), true);
         
-        // Validar campos requeridos
         if (!isset($data['numero_arete'])) {
             http_response_code(400);
             echo json_encode(array("message" => "El campo numero_arete es requerido para actualizar"));
@@ -123,7 +115,6 @@ switch ($method) {
         $nombre_raza = isset($data['nombre_raza']) ? $data['nombre_raza'] : null;
         $altura = isset($data['altura']) ? $data['altura'] : null;
         
-        // Verificar si existe el número de arete
         $sql_check = "SELECT id FROM raza WHERE numero_arete = ?";
         $stmt_check = $conn->prepare($sql_check);
         $stmt_check->bind_param("s", $numero_arete);
@@ -136,7 +127,6 @@ switch ($method) {
             break;
         }
         
-        // Construir consulta dinámica
         $fields = array();
         $types = "";
         $values = array();
@@ -179,7 +169,6 @@ switch ($method) {
         $sql = "UPDATE raza SET " . implode(", ", $fields) . " WHERE numero_arete = ?";
         $stmt = $conn->prepare($sql);
         
-        // Enlazar parámetros dinámicamente
         $stmt->bind_param($types, ...$values);
         
         if ($stmt->execute()) {
@@ -194,7 +183,7 @@ switch ($method) {
         break;
         
     case 'DELETE':
-        // Eliminar registro por número de arete
+        // Aqui eliminamos la raza
         $data = json_decode(file_get_contents("php://input"), true);
         
         if (!isset($data['numero_arete'])) {
@@ -205,7 +194,6 @@ switch ($method) {
         
         $numero_arete = $data['numero_arete'];
         
-        // Verificar si existe el número de arete
         $sql_check = "SELECT id FROM raza WHERE numero_arete = ?";
         $stmt_check = $conn->prepare($sql_check);
         $stmt_check->bind_param("s", $numero_arete);
@@ -234,12 +222,10 @@ switch ($method) {
         break;
         
     default:
-        // Método no permitido
         http_response_code(405);
         echo json_encode(array("message" => "Método no permitido"));
         break;
 }
 
-// Cerrar conexión
 $conn->close();
 ?>

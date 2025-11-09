@@ -2,16 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:ganabo/Pages/Pdf_Servicet.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter/foundation.dart'; // ← AÑADE ESTA IMPORTACIÓN
+import 'package:flutter/foundation.dart';
 
-// ← AÑADE ESTA FUNCIÓN FUERA DE LA CLASE
 String getApiUrl(String endpoint) {
-  // Para WEB: Usar HTTPS
   if (kIsWeb) {
     return 'https://ganabovino.atwebpages.com/api/$endpoint.php';
-  }
-  // Para MÓVIL: Usar HTTP
-  else {
+  } else {
     return 'http://ganabovino.atwebpages.com/api/$endpoint.php';
   }
 }
@@ -24,54 +20,144 @@ class VacunacionPage extends StatefulWidget {
 }
 
 class _VacunacionPageState extends State<VacunacionPage> {
-  // Controladores para los TextFields
+  // Aqui agregamos los controladores para los textfields
   final TextEditingController _numeroAreteController = TextEditingController();
-  final TextEditingController _fechaVacunacionController = TextEditingController();
-  final TextEditingController _vacunaAplicadaController = TextEditingController();
-  final TextEditingController _viaAdministracionController = TextEditingController();
+  final TextEditingController _fechaVacunacionController =
+      TextEditingController();
   final TextEditingController _dosisController = TextEditingController();
-  final TextEditingController _aplicadorController = TextEditingController();
-  final TextEditingController _proximaVacunacionController = TextEditingController();
-  final TextEditingController _observacionesController = TextEditingController();
+  final TextEditingController _proximaVacunacionController =
+      TextEditingController();
+  final TextEditingController _observacionesController =
+      TextEditingController();
 
-  // Lista para almacenar las vacunaciones
+  String? _selectedMedicamento;
+  String? _selectedViaAdministracion;
+  String? _selectedTrabajador;
+
+  List<String> _medicamentos = [];
+  List<String> _trabajadores = [];
+
+  final List<String> _viasAdministracion = [
+    'Subcutánea',
+    'Intramuscular',
+    'Intravenosa',
+    'Tópica',
+    'Oral',
+    'Otra',
+  ];
+
   List<Vacunacion> _vacunaciones = [];
 
-  // Función para mostrar mensajes
-  void _mostrarMensaje(String mensaje) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensaje)),
-    );
+  @override
+  void initState() {
+    super.initState();
+    _cargarMedicamentos();
+    _cargarTrabajadores();
   }
 
-  // Función para limpiar campos
+  // Aqui cargamos los medicamentos desde la tabla de medicamentos
+  Future<void> _cargarMedicamentos() async {
+    try {
+      final url = Uri.parse(getApiUrl('medicamentos'));
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData['success'] == true) {
+          final List<dynamic> medicamentosData = responseData['data'] ?? [];
+          final nombresMedicamentos =
+              medicamentosData
+                  .map<String>(
+                    (medicamento) =>
+                        medicamento['nombre_medicamento']?.toString() ?? '',
+                  )
+                  .where((nombre) => nombre.isNotEmpty)
+                  .toList();
+
+          nombresMedicamentos.sort();
+
+          setState(() {
+            _medicamentos = nombresMedicamentos;
+          });
+        }
+      }
+    } catch (e) {
+      print('Error al cargar medicamentos: $e');
+    }
+  }
+
+  // Aqui cargamos los trabajadores desde la tabla de trabajadores
+  Future<void> _cargarTrabajadores() async {
+    try {
+      final url = Uri.parse(getApiUrl('trabajadores'));
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData['success'] == true) {
+          final List<dynamic> trabajadoresData = responseData['data'] ?? [];
+          final nombresTrabajadores =
+              trabajadoresData
+                  .map<String>(
+                    (trabajador) =>
+                        trabajador['nombre_completo']?.toString() ?? '',
+                  )
+                  .where((nombre) => nombre.isNotEmpty)
+                  .toList();
+
+          nombresTrabajadores.sort();
+
+          setState(() {
+            _trabajadores = nombresTrabajadores;
+          });
+        }
+      }
+    } catch (e) {
+      print('Error al cargar trabajadores: $e');
+    }
+  }
+
+  // Aqui mostramos los mensajes
+  void _mostrarMensaje(String mensaje) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(mensaje)));
+  }
+
+  // Aqui limpiamos los campos
   void _limpiarCampos() {
     _numeroAreteController.clear();
     _fechaVacunacionController.clear();
-    _vacunaAplicadaController.clear();
-    _viaAdministracionController.clear();
     _dosisController.clear();
-    _aplicadorController.clear();
     _proximaVacunacionController.clear();
     _observacionesController.clear();
+    setState(() {
+      _selectedMedicamento = null;
+      _selectedViaAdministracion = null;
+      _selectedTrabajador = null;
+    });
     _mostrarMensaje('Campos limpiados');
   }
 
-  // Función para validar campos obligatorios
+  // Aqui validamos los campos obligatorios
   bool _validarCampos() {
     if (_numeroAreteController.text.isEmpty ||
         _fechaVacunacionController.text.isEmpty ||
-        _vacunaAplicadaController.text.isEmpty ||
-        _viaAdministracionController.text.isEmpty ||
+        _selectedMedicamento == null ||
+        _selectedViaAdministracion == null ||
         _dosisController.text.isEmpty ||
-        _aplicadorController.text.isEmpty) {
+        _selectedTrabajador == null) {
       _mostrarMensaje('Por favor, complete todos los campos obligatorios');
       return false;
     }
+
+    if (double.tryParse(_dosisController.text) == null) {
+      _mostrarMensaje('Por favor, ingrese una dosis válida');
+      return false;
+    }
+
     return true;
   }
 
-  // AGREGAR - Crear nuevo registro
+  // Aqui creamos un nuevo registro
   Future<void> _agregarVacunacion() async {
     if (!_validarCampos()) return;
 
@@ -83,16 +169,21 @@ class _VacunacionPageState extends State<VacunacionPage> {
         body: json.encode({
           'numero_arete': _numeroAreteController.text,
           'fecha_vacunacion': _fechaVacunacionController.text,
-          'vacuna_aplicada': _vacunaAplicadaController.text,
-          'via_administracion': _viaAdministracionController.text,
+          'vacuna_aplicada':
+              _selectedMedicamento!, 
+          'via_administracion':
+              _selectedViaAdministracion!, 
           'dosis': double.parse(_dosisController.text),
-          'aplicador': _aplicadorController.text,
-          'proxima_vacunacion': _proximaVacunacionController.text.isNotEmpty 
-              ? _proximaVacunacionController.text 
-              : null,
-          'observaciones': _observacionesController.text.isNotEmpty 
-              ? _observacionesController.text 
-              : null,
+          'aplicador':
+              _selectedTrabajador!, 
+          'proxima_vacunacion':
+              _proximaVacunacionController.text.isNotEmpty
+                  ? _proximaVacunacionController.text
+                  : null,
+          'observaciones':
+              _observacionesController.text.isNotEmpty
+                  ? _observacionesController.text
+                  : null,
         }),
       );
 
@@ -108,7 +199,7 @@ class _VacunacionPageState extends State<VacunacionPage> {
     }
   }
 
-  // CONSULTAR - Buscar por número de arete
+  // Aqui consultamos los datos
   Future<void> _consultarVacunacion() async {
     if (_numeroAreteController.text.isEmpty) {
       _mostrarMensaje('Ingrese el número de arete para consultar');
@@ -116,22 +207,29 @@ class _VacunacionPageState extends State<VacunacionPage> {
     }
 
     try {
-      final url = Uri.parse("${getApiUrl('vacunacion')}?numero_arete=${_numeroAreteController.text}");
+      final url = Uri.parse(
+        "${getApiUrl('vacunacion')}?numero_arete=${_numeroAreteController.text}",
+      );
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data is List && data.isNotEmpty) {
-          // Mostrar el último registro
           final ultimoRegistro = data[0];
-          _fechaVacunacionController.text = ultimoRegistro['fecha_vacunacion'] ?? '';
-          _vacunaAplicadaController.text = ultimoRegistro['vacuna_aplicada'] ?? '';
-          _viaAdministracionController.text = ultimoRegistro['via_administracion'] ?? '';
+          _fechaVacunacionController.text =
+              ultimoRegistro['fecha_vacunacion'] ?? '';
           _dosisController.text = ultimoRegistro['dosis']?.toString() ?? '';
-          _aplicadorController.text = ultimoRegistro['aplicador'] ?? '';
-          _proximaVacunacionController.text = ultimoRegistro['proxima_vacunacion'] ?? '';
+          _proximaVacunacionController.text =
+              ultimoRegistro['proxima_vacunacion'] ?? '';
           _observacionesController.text = ultimoRegistro['observaciones'] ?? '';
-          
+
+          setState(() {
+            _selectedMedicamento = ultimoRegistro['vacuna_aplicada'] ?? '';
+            _selectedViaAdministracion =
+                ultimoRegistro['via_administracion'] ?? '';
+            _selectedTrabajador = ultimoRegistro['aplicador'] ?? '';
+          });
+
           _mostrarMensaje('${data.length} registros encontrados');
         } else {
           _mostrarMensaje('No se encontraron registros');
@@ -144,7 +242,7 @@ class _VacunacionPageState extends State<VacunacionPage> {
     }
   }
 
-  // MODIFICAR - Actualizar registro
+  // Aqui modificamos los datos
   Future<void> _modificarVacunacion() async {
     if (!_validarCampos()) return;
 
@@ -156,16 +254,21 @@ class _VacunacionPageState extends State<VacunacionPage> {
         body: json.encode({
           'numero_arete': _numeroAreteController.text,
           'fecha_vacunacion': _fechaVacunacionController.text,
-          'vacuna_aplicada': _vacunaAplicadaController.text,
-          'via_administracion': _viaAdministracionController.text,
+          'vacuna_aplicada':
+              _selectedMedicamento!, 
+          'via_administracion':
+              _selectedViaAdministracion!, 
           'dosis': double.parse(_dosisController.text),
-          'aplicador': _aplicadorController.text,
-          'proxima_vacunacion': _proximaVacunacionController.text.isNotEmpty 
-              ? _proximaVacunacionController.text 
-              : null,
-          'observaciones': _observacionesController.text.isNotEmpty 
-              ? _observacionesController.text 
-              : null,
+          'aplicador':
+              _selectedTrabajador!, 
+          'proxima_vacunacion':
+              _proximaVacunacionController.text.isNotEmpty
+                  ? _proximaVacunacionController.text
+                  : null,
+          'observaciones':
+              _observacionesController.text.isNotEmpty
+                  ? _observacionesController.text
+                  : null,
         }),
       );
 
@@ -180,21 +283,44 @@ class _VacunacionPageState extends State<VacunacionPage> {
     }
   }
 
-  // ELIMINAR - Borrar registro
+  // Aqui eliminamos los datos
   Future<void> _eliminarVacunacion() async {
-    if (_numeroAreteController.text.isEmpty || _fechaVacunacionController.text.isEmpty) {
-      _mostrarMensaje('Ingrese número de arete y fecha para eliminar');
+    if (_numeroAreteController.text.isEmpty) {
+      _mostrarMensaje('Ingrese número de arete para eliminar');
       return;
     }
 
     try {
+      // Aqui mostramos el mensaje de confirmacion de eliminacion
+      final confirmar = await showDialog(
+        context: context,
+        builder:
+            (context) => AlertDialog(
+              title: Text('¿Eliminar vacunaciones?'),
+              content: Text(
+                '¿Está seguro de que desea eliminar TODAS las vacunaciones del arete ${_numeroAreteController.text}?',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text('Cancelar'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: Text('Eliminar', style: TextStyle(color: Colors.red)),
+                ),
+              ],
+            ),
+      );
+
+      if (confirmar != true) return;
+
       final url = Uri.parse(getApiUrl('vacunacion'));
       final response = await http.delete(
         url,
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'numero_arete': _numeroAreteController.text,
-          'fecha_vacunacion': _fechaVacunacionController.text,
         }),
       );
 
@@ -210,16 +336,17 @@ class _VacunacionPageState extends State<VacunacionPage> {
     }
   }
 
-  // CARGAR VACUNACIONES - Obtener todos los registros
+  // Aqui cargamos todas las vacunaciones
   Future<void> _cargarVacunaciones() async {
     try {
       final url = Uri.parse(getApiUrl('vacunacion'));
       final response = await http.get(url);
-      
+
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         setState(() {
-          _vacunaciones = data.map((item) => Vacunacion.fromJson(item)).toList();
+          _vacunaciones =
+              data.map((item) => Vacunacion.fromJson(item)).toList();
         });
       } else {
         throw Exception('Error al cargar las vacunaciones');
@@ -229,293 +356,297 @@ class _VacunacionPageState extends State<VacunacionPage> {
     }
   }
 
-  // GENERAR PDF
+  // Aqui creamos el pdf
   Future<void> _generarPDF() async {
     try {
-      // Cargar los datos primero
+      // Aqui cargamos los datos
       await _cargarVacunaciones();
-      
-      // Crear instancia del servicio PDF
+
       final pdfService = PdfServicet();
-      
-      // Generar y abrir PDF
+
+      // Aqui generamos y abrimos el pdf
       await pdfService.guardarYAbrirPdf(
         _vacunaciones.map((v) => v.toJson()).toList(),
-        'Reporte_Vacunaciones_${DateTime.now().millisecondsSinceEpoch}'
+        'Reporte_Vacunaciones_${DateTime.now().millisecondsSinceEpoch}',
       );
-      
+
       _mostrarMensaje('PDF generado exitosamente');
     } catch (e) {
       _mostrarMensaje('Error al generar PDF: $e');
     }
   }
 
-  // VER LISTA - Navegar a lista de registros
+  // Aqui vemos la lista en formato de tabla
   void _verLista() {
     _cargarVacunaciones().then((_) {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => Scaffold(
-            appBar: AppBar(
-              title: const Text('LISTA COMPLETA DE VACUNACIONES'),
-              backgroundColor: Colors.blueGrey[800],
-              foregroundColor: Colors.white,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ),
-            body: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  // Encabezados de la tabla
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.blueGrey[800],
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 15,
-                      horizontal: 8,
-                    ),
-                    child: const Row(
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            'N° ARETE',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontSize: 12,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            'FECHA VAC.',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontSize: 12,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            'VACUNA',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontSize: 12,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            'VÍA ADMIN.',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontSize: 12,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Text(
-                            'DOSIS',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontSize: 12,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            'APLICADOR',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontSize: 12,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            'PRÓXIMA VAC.',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontSize: 12,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            'OBSERVACIONES',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontSize: 12,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ],
-                    ),
+          builder:
+              (context) => Scaffold(
+                appBar: AppBar(
+                  title: const Text('LISTA COMPLETA DE VACUNACIONES'),
+                  backgroundColor: Colors.blueGrey[800],
+                  foregroundColor: Colors.white,
+                  leading: IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () => Navigator.of(context).pop(),
                   ),
-                  const SizedBox(height: 10),
-
-                  // Contenido de la tabla
-                  Expanded(
-                    child: _vacunaciones.isEmpty
-                        ? Center(
-                            child: Text(
-                              'No hay registros de vacunación',
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.grey[600],
+                ),
+                body: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      // Aqui ponemos los encabezados de la tabla
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.blueGrey[800],
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 15,
+                          horizontal: 8,
+                        ),
+                        child: const Row(
+                          children: [
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                'N° ARETE',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
                             ),
-                          )
-                        : ListView.builder(
-                            itemCount: _vacunaciones.length,
-                            itemBuilder: (context, index) {
-                              final vacunacion = _vacunaciones[index];
-                              return Container(
-                                decoration: BoxDecoration(
-                                  color: index.isEven
-                                      ? Colors.grey[50]
-                                      : Colors.white,
-                                  border: Border(
-                                    bottom: BorderSide(
-                                      color: Colors.grey[300]!,
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                'FECHA VAC.',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                'MEDICAMENTO', 
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                'VÍA ADMIN.',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Text(
+                                'DOSIS',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                'TRABAJADOR', 
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                'PRÓXIMA VAC.',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                'OBSERVACIONES',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Aqui ponemos el contenido de la tabla
+                      Expanded(
+                        child:
+                            _vacunaciones.isEmpty
+                                ? Center(
+                                  child: Text(
+                                    'No hay registros de vacunación',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.grey[600],
                                     ),
                                   ),
+                                )
+                                : ListView.builder(
+                                  itemCount: _vacunaciones.length,
+                                  itemBuilder: (context, index) {
+                                    final vacunacion = _vacunaciones[index];
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                        color:
+                                            index.isEven
+                                                ? Colors.grey[50]
+                                                : Colors.white,
+                                        border: Border(
+                                          bottom: BorderSide(
+                                            color: Colors.grey[300]!,
+                                          ),
+                                        ),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 12,
+                                        horizontal: 8,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          // Aqui ponemos el N° Arete
+                                          Expanded(
+                                            flex: 2,
+                                            child: Text(
+                                              vacunacion.numeroArete,
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.normal,
+                                                fontSize: 11,
+                                              ),
+                                            ),
+                                          ),
+                                          // Aqui ponemos la Fecha de Vacunación
+                                          Expanded(
+                                            flex: 2,
+                                            child: Text(
+                                              vacunacion.fechaVacunacion,
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                              ),
+                                            ),
+                                          ),
+                                          // Aqui ponemos el Medicamento
+                                          Expanded(
+                                            flex: 2,
+                                            child: Text(
+                                              vacunacion.vacunaAplicada,
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                              ),
+                                            ),
+                                          ),
+                                          // Aqui ponemos la Vía de Administración
+                                          Expanded(
+                                            flex: 2,
+                                            child: Text(
+                                              vacunacion.viaAdministracion,
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                              ),
+                                            ),
+                                          ),
+                                          // Aqui ponemos la Dosis
+                                          Expanded(
+                                            flex: 1,
+                                            child: Text(
+                                              vacunacion.dosis.toString(),
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                              ),
+                                            ),
+                                          ),
+                                          // Aqui ponemos el Trabajador
+                                          Expanded(
+                                            flex: 2,
+                                            child: Text(
+                                              vacunacion.aplicador,
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                              ),
+                                            ),
+                                          ),
+                                          // Aqui ponemos la Próxima Vacunación
+                                          Expanded(
+                                            flex: 2,
+                                            child: Text(
+                                              vacunacion.proximaVacunacion ??
+                                                  '',
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                              ),
+                                            ),
+                                          ),
+                                          // Aqui ponemos las Observaciones
+                                          Expanded(
+                                            flex: 2,
+                                            child: Text(
+                                              vacunacion.observaciones ??
+                                                  '',
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                              ),
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
                                 ),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                  horizontal: 8,
-                                ),
-                                child: Row(
-                                  children: [
-                                    // N° Arete
-                                    Expanded(
-                                      flex: 2,
-                                      child: Text(
-                                        vacunacion.numeroArete,
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.normal,
-                                          fontSize: 11,
-                                        ),
-                                      ),
-                                    ),
-                                    // Fecha Vacunación
-                                    Expanded(
-                                      flex: 2,
-                                      child: Text(
-                                        vacunacion.fechaVacunacion,
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                        ),
-                                      ),
-                                    ),
-                                    // Vacuna Aplicada
-                                    Expanded(
-                                      flex: 2,
-                                      child: Text(
-                                        vacunacion.vacunaAplicada,
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                        ),
-                                      ),
-                                    ),
-                                    // Vía Administración
-                                    Expanded(
-                                      flex: 2,
-                                      child: Text(
-                                        vacunacion.viaAdministracion,
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                        ),
-                                      ),
-                                    ),
-                                    // Dosis
-                                    Expanded(
-                                      flex: 1,
-                                      child: Text(
-                                        vacunacion.dosis.toString(),
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                        ),
-                                      ),
-                                    ),
-                                    // Aplicador
-                                    Expanded(
-                                      flex: 2,
-                                      child: Text(
-                                        vacunacion.aplicador,
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                        ),
-                                      ),
-                                    ),
-                                    // Próxima Vacunación
-                                    Expanded(
-                                      flex: 2,
-                                      child: Text(
-                                        vacunacion.proximaVacunacion ?? 'N/A',
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                        ),
-                                      ),
-                                    ),
-                                    // Observaciones
-                                    Expanded(
-                                      flex: 2,
-                                      child: Text(
-                                        vacunacion.observaciones ?? 'Sin obs.',
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                        ),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
         ),
       );
     });
@@ -546,8 +677,8 @@ class _VacunacionPageState extends State<VacunacionPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                
-                // Número de arete
+
+                // Aqui ponemos el Número de arete
                 TextFormField(
                   controller: _numeroAreteController,
                   decoration: InputDecoration(
@@ -559,8 +690,8 @@ class _VacunacionPageState extends State<VacunacionPage> {
                   keyboardType: TextInputType.number,
                 ),
                 const SizedBox(height: 15),
-                
-                // Fecha de vacunación
+
+                // Aqui ponemos la Fecha de vacunación
                 TextFormField(
                   controller: _fechaVacunacionController,
                   decoration: InputDecoration(
@@ -578,38 +709,74 @@ class _VacunacionPageState extends State<VacunacionPage> {
                       lastDate: DateTime(2100),
                     );
                     if (picked != null) {
-                      _fechaVacunacionController.text = 
+                      _fechaVacunacionController.text =
                           "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
                     }
                   },
                 ),
                 const SizedBox(height: 15),
-                
-                // Vacuna aplicada
-                TextFormField(
-                  controller: _vacunaAplicadaController,
+
+                // Aqui ponemos el Medicamento
+                DropdownButtonFormField<String>(
+                  value: _selectedMedicamento,
                   decoration: InputDecoration(
-                    labelText: 'Vacuna aplicada',
+                    labelText: 'Medicamento',
                     border: OutlineInputBorder(),
                     filled: true,
                     fillColor: Colors.white,
                   ),
+                  items:
+                      _medicamentos.map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                  onChanged: (newValue) {
+                    setState(() {
+                      _selectedMedicamento = newValue;
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor seleccione un medicamento';
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 15),
-                
-                // Vía de administración
-                TextFormField(
-                  controller: _viaAdministracionController,
+
+                // Aqui ponemos la Via De Administracion
+                DropdownButtonFormField<String>(
+                  value: _selectedViaAdministracion,
                   decoration: InputDecoration(
                     labelText: 'Vía de administración',
                     border: OutlineInputBorder(),
                     filled: true,
                     fillColor: Colors.white,
                   ),
+                  items:
+                      _viasAdministracion.map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                  onChanged: (newValue) {
+                    setState(() {
+                      _selectedViaAdministracion = newValue;
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor seleccione una vía de administración';
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 15),
-                
-                // Dosis
+
+                // Aqui ponemos la Dosis
                 TextFormField(
                   controller: _dosisController,
                   decoration: InputDecoration(
@@ -621,20 +788,38 @@ class _VacunacionPageState extends State<VacunacionPage> {
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                 ),
                 const SizedBox(height: 15),
-                
-                // Aplicador
-                TextFormField(
-                  controller: _aplicadorController,
+
+                // Aqui ponemos el Trabajador 
+                DropdownButtonFormField<String>(
+                  value: _selectedTrabajador,
                   decoration: InputDecoration(
-                    labelText: 'Aplicador',
+                    labelText: 'Trabajador',
                     border: OutlineInputBorder(),
                     filled: true,
                     fillColor: Colors.white,
                   ),
+                  items:
+                      _trabajadores.map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                  onChanged: (newValue) {
+                    setState(() {
+                      _selectedTrabajador = newValue;
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor seleccione un trabajador';
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 15),
-                
-                // Próxima vacunación
+
+                // Aqui ponemos la Próxima vacunación
                 TextFormField(
                   controller: _proximaVacunacionController,
                   decoration: InputDecoration(
@@ -652,14 +837,14 @@ class _VacunacionPageState extends State<VacunacionPage> {
                       lastDate: DateTime(2100),
                     );
                     if (picked != null) {
-                      _proximaVacunacionController.text = 
+                      _proximaVacunacionController.text =
                           "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
                     }
                   },
                 ),
                 const SizedBox(height: 15),
-                
-                // Observaciones
+
+                // Aqui ponemos las Observaciones
                 TextFormField(
                   controller: _observacionesController,
                   decoration: InputDecoration(
@@ -673,8 +858,7 @@ class _VacunacionPageState extends State<VacunacionPage> {
                   keyboardType: TextInputType.multiline,
                 ),
                 const SizedBox(height: 30),
-                
-                // Botones
+
                 Wrap(
                   spacing: 10,
                   runSpacing: 10,
@@ -748,20 +932,16 @@ class _VacunacionPageState extends State<VacunacionPage> {
 
   @override
   void dispose() {
-    // Limpiar controladores
+    // Aqui limpiamos los controladores
     _numeroAreteController.dispose();
     _fechaVacunacionController.dispose();
-    _vacunaAplicadaController.dispose();
-    _viaAdministracionController.dispose();
     _dosisController.dispose();
-    _aplicadorController.dispose();
     _proximaVacunacionController.dispose();
     _observacionesController.dispose();
     super.dispose();
   }
 }
 
-// Modelo Vacunacion
 class Vacunacion {
   final String numeroArete;
   final String fechaVacunacion;
@@ -796,7 +976,6 @@ class Vacunacion {
     );
   }
 
-  // Método toJson para convertir a Map
   Map<String, dynamic> toJson() {
     return {
       'numero_arete': numeroArete,

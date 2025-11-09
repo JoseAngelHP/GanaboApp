@@ -4,98 +4,128 @@ header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-$servername = "fdb1033.awardspace.net";
-$username = "4685324_ganabo";
-$password = "Angelito123";
-$dbname = "4685324_ganabo";
+$servername = "fdb1033.awardspace.net";//Aqui ponemos el servidor de la base de datos
+$username = "4685324_ganabo";//Aqui ponemos el usuario de la base de datos
+$password = "Angelito123";//Aqui ponemos la contraseña de la base de datos
+$dbname = "4685324_ganabo";//Aqui ponemos el nombre de la base de datos
 
-// Crear conexión
+// Aqui creamos la conexión
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Verificar conexión
+// Aqui verificamos la conexión
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Obtener método de la solicitud
+// Aqui obtenemos el método de la solicitud
 $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'GET':
-       // Consultar animales (con filtro por número de arete si se proporciona)
-    if (isset($_GET['numero_arete'])) {
-        $numero_arete = $_GET['numero_arete'];
-        
-        // Usar consultas preparadas para seguridad
-        $stmt = $conn->prepare("SELECT * FROM animales WHERE numero_arete = ?");
-        $stmt->bind_param("s", $numero_arete); // "s" para string
-        $stmt->execute();
-        $result = $stmt->get_result();
-    } else {
-        $stmt = $conn->prepare("SELECT * FROM animales");
-        $stmt->execute();
-        $result = $stmt->get_result();
-    }
-    
-    $animales = array();
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            $animales[] = $row;
+        // Aqui consultamos a los animales
+        if (isset($_GET['numero_arete'])) {
+            $numero_arete = $_GET['numero_arete'];
+            
+            $stmt = $conn->prepare("SELECT * FROM animales WHERE numero_arete = ?");
+            $stmt->bind_param("s", $numero_arete); 
+            $stmt->execute();
+            $result = $stmt->get_result();
+        } else {
+            $stmt = $conn->prepare("SELECT * FROM animales");
+            $stmt->execute();
+            $result = $stmt->get_result();
         }
-    }
-    echo json_encode($animales);
-    break;
         
+        $animales = array();
+        if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+                $animales[] = $row;
+            }
+        }
+        echo json_encode($animales);
+        break;
+            
     case 'POST':
-        // Insertar nuevo animal
+        // Aqui insertamos un nuevo animal
         $data = json_decode(file_get_contents("php://input"), true);
         
-        $sql = "INSERT INTO animales (numero_arete, raza, sexo, fecha_nacimiento, origen, padre, madre, foto_path) 
-                VALUES ('".$data['numero_arete']."', '".$data['raza']."', '".$data['sexo']."', '".$data['fecha_nacimiento']."', 
-                        '".$data['origen']."', '".$data['padre']."', '".$data['madre']."', '".$data['foto_path']."')";
+        $stmt = $conn->prepare("INSERT INTO animales (numero_arete, raza, sexo, fecha_nacimiento, origen, padre, madre, adquisicion, foto_path) 
+                               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
         
-        if ($conn->query($sql) === TRUE) {
+        $stmt->bind_param("sssssssss", 
+            $data['numero_arete'],
+            $data['raza'],
+            $data['sexo'],
+            $data['fecha_nacimiento'],
+            $data['origen'],
+            $data['padre'],
+            $data['madre'],
+            $data['adquisicion'],
+            $data['foto_path']
+        );
+        
+        if ($stmt->execute()) {
             echo json_encode(array("message" => "Animal creado correctamente"));
         } else {
-            echo json_encode(array("error" => "Error: " . $conn->error));
+            echo json_encode(array("error" => "Error: " . $stmt->error));
         }
+        $stmt->close();
         break;
         
     case 'PUT':
-        // Actualizar animal
+        // Aqui actualizamos un animal
         $data = json_decode(file_get_contents("php://input"), true);
-        $id = $data['id'];
         
-        $sql = "UPDATE animales SET 
-                numero_arete = '".$data['numero_arete']."',
-                raza = '".$data['raza']."',
-                sexo = '".$data['sexo']."',
-                fecha_nacimiento = '".$data['fecha_nacimiento']."',
-                origen = '".$data['origen']."',
-                padre = '".$data['padre']."',
-                madre = '".$data['madre']."',
-                foto_path = '".$data['foto_path']."'
-                WHERE id = $id";
+        $stmt = $conn->prepare("UPDATE animales SET 
+                               numero_arete = ?,
+                               raza = ?,
+                               sexo = ?,
+                               fecha_nacimiento = ?,
+                               origen = ?,
+                               padre = ?,
+                               madre = ?,
+                               adquisicion = ?,
+                               foto_path = ?
+                               WHERE id = ?");
         
-        if ($conn->query($sql) === TRUE) {
+        $stmt->bind_param("sssssssssi", 
+            $data['numero_arete'],
+            $data['raza'],
+            $data['sexo'],
+            $data['fecha_nacimiento'],
+            $data['origen'],
+            $data['padre'],
+            $data['madre'],
+            $data['adquisicion'],
+            $data['foto_path'],
+            $data['id']
+        );
+        
+        if ($stmt->execute()) {
             echo json_encode(array("message" => "Animal actualizado correctamente"));
         } else {
-            echo json_encode(array("error" => "Error: " . $conn->error));
+            echo json_encode(array("error" => "Error: " . $stmt->error));
         }
+        $stmt->close();
         break;
         
     case 'DELETE':
-        // Eliminar animal
+        // Aqui eliminamos el animal
         $data = json_decode(file_get_contents("php://input"), true);
-        $id = $data['id'];
         
-        $sql = "DELETE FROM animales WHERE id = $id";
+        $stmt = $conn->prepare("DELETE FROM animales WHERE id = ?");
+        $stmt->bind_param("i", $data['id']);
         
-        if ($conn->query($sql) === TRUE) {
+        if ($stmt->execute()) {
             echo json_encode(array("message" => "Animal eliminado correctamente"));
         } else {
-            echo json_encode(array("error" => "Error: " . $conn->error));
+            echo json_encode(array("error" => "Error: " . $stmt->error));
         }
+        $stmt->close();
+        break;
+        
+    default:
+        echo json_encode(array("error" => "Método no permitido"));
         break;
 }
 

@@ -3,9 +3,11 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:ganabo/Pages/Navigation_Drawer.dart';
 
 class InicioPage extends StatelessWidget {
-  const InicioPage({Key? key}) : super(key: key);
+  final Map<String, dynamic>? userData; // Aqui agregamos el parametro de usuarios
+  
+  const InicioPage({Key? key, this.userData}) : super(key: key); // Aqui agregamos su constructor
 
-  // Función para abrir el enlace:cite[1]:cite[4]
+  // Aqui agregamos la funcion para acceder al enlace
   Future<void> _abrirEnlace() async {
     final Uri url = Uri.parse('https://www.siniiga.org.mx/manuales.html');
     if (!await launchUrl(url)) {
@@ -20,14 +22,13 @@ class InicioPage extends StatelessWidget {
       title: const Text("Inicio"),
       backgroundColor: Colors.yellow[100],
     ),
-    drawer: const CustomNavigationDrawer(), // Agrega el drawer aquí
+    drawer: CustomNavigationDrawer(userData: userData), 
     body: Column(
       children: [
-        // TextView equivalente (arriba de la imagen)
         Container(
-          margin: const EdgeInsets.all(16.0), // Margen opcional
+          margin: const EdgeInsets.all(16.0),
           child: const Text(
-            "TIPS Y CONSEJOS", // Tu texto aquí
+            "TIPS Y CONSEJOS",
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -35,7 +36,6 @@ class InicioPage extends StatelessWidget {
             ),
           ),
         ),
-        // ImageView con fitXY
         InteractiveViewer(
           boundaryMargin: const EdgeInsets.all(20.0),
           minScale: 0.1,
@@ -45,14 +45,14 @@ class InicioPage extends StatelessWidget {
             height: 474,
             child: Image.asset(
               'Icons/info.png',
-              fit: BoxFit.fill, // fitXY
+              fit: BoxFit.fill, 
             ),
           ),
         ),
         Container(
-          margin: const EdgeInsets.all(16.0), // Margen opcional
+          margin: const EdgeInsets.all(16.0),
           child: const Text(
-            "Reglamento del SINIIGA", // Tu texto aquí
+            "Reglamento del SINIIGA",
             style: TextStyle(
               fontSize: 25,
               fontWeight: FontWeight.w300,
@@ -60,22 +60,20 @@ class InicioPage extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 15), // Espacio
-        // Texto con enlace clickeable
+        const SizedBox(height: 15),
+        // Aqui ponemos el texto con el link para dar click en el
         InkWell(
           onTap: _abrirEnlace,
           child: const Row(
-            mainAxisSize:
-                MainAxisSize
-                    .min, // Para que el Row ocupe solo el espacio necesario
+            mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                "👉", // Emoji de mano señalando (puedes cambiarlo por cualquier otro)
+                "👉",
                 style: TextStyle(
-                  fontSize: 22, // Tamaño slightly diferente si lo deseas
+                  fontSize: 22,
                 ),
               ),
-              SizedBox(width: 5), // Espacio pequeño entre texto e icono
+              SizedBox(width: 5),
               Text(
                 "Click Aquí ",
                 style: TextStyle(

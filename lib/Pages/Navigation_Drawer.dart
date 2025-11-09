@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:ganabo/Pages/Contactos.dart';
 import 'package:ganabo/Pages/Engorda.dart';
-import 'package:ganabo/Pages/Inicio.dart';
-import 'package:ganabo/Pages/Madre.dart';
-import 'package:ganabo/Pages/Origen.dart';
-import 'package:ganabo/Pages/Padre.dart';
+import 'package:ganabo/Pages/Rancho.dart';
+import 'package:ganabo/Pages/Medicamento.dart';
+import 'package:ganabo/Pages/Trabajador.dart';
 import 'package:ganabo/Pages/Pesaje.dart';
 import 'package:ganabo/Pages/Producciondeleche.dart';
 import 'package:ganabo/Pages/Quienesomos.dart';
@@ -13,8 +12,55 @@ import 'package:ganabo/Pages/Registro.dart';
 import 'package:ganabo/Pages/UserPage.dart';
 import 'package:ganabo/Pages/Vacunacion.dart';
 
-class CustomNavigationDrawer extends StatelessWidget {
-  const CustomNavigationDrawer({Key? key}) : super(key: key);
+class Usuario {
+  final String usuario;
+  final String correo;
+
+  Usuario({required this.usuario, required this.correo});
+
+  factory Usuario.fromJson(Map<String, dynamic> json) {
+    return Usuario(
+      usuario: json['usuario'] ?? 'Usuario',
+      correo: json['correo'] ?? 'correo@ejemplo.com',
+    );
+  }
+}
+
+class CustomNavigationDrawer extends StatefulWidget {
+  final Map<String, dynamic>? userData;
+
+  const CustomNavigationDrawer({Key? key, this.userData}) : super(key: key);
+
+  @override
+  State<CustomNavigationDrawer> createState() => _CustomNavigationDrawerState();
+}
+
+class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
+  Usuario _usuarioActual = Usuario(usuario: 'Usuario', correo: 'correo@ejemplo.com');
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarUsuarioDesdeLogin();
+  }
+
+  void _cargarUsuarioDesdeLogin() {
+    print('Cargando usuario desde login...');
+    
+    if (widget.userData != null) {
+      print('Datos recibidos: ${widget.userData}');
+      
+      setState(() {
+        _usuarioActual = Usuario(
+          usuario: widget.userData!['usuario'] ?? 'Usuario',
+          correo: widget.userData!['correo'] ?? 'correo@ejemplo.com',
+        );
+      });
+      print('Usuario cargado: ${_usuarioActual.usuario} - ${_usuarioActual.correo}');
+    } else {
+      print('No hay datos de usuario');
+    }
+  }
 
   @override
   Widget build(BuildContext context) => Drawer(
@@ -32,7 +78,11 @@ class CustomNavigationDrawer extends StatelessWidget {
     child: InkWell(
       onTap: () {
         Navigator.pop(context);
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => const UserPage()));
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => UserPage(usuario: _usuarioActual),
+          ),
+        );
       },
       child: Container(
         padding: EdgeInsets.only(
@@ -40,20 +90,21 @@ class CustomNavigationDrawer extends StatelessWidget {
           bottom: 24,
         ),
         child: Column(
-          children: const [
+          children: [
             CircleAvatar(
               radius: 52,
               backgroundImage: NetworkImage(
-                "https://images.unsplash.com/photo-1546464677-c25cd52c470b?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                "https://plus.unsplash.com/premium_vector-1722668647008-43d787e8cc17?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=880",
               ),
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Text(
-              'Frank',
+              _usuarioActual.usuario,
               style: TextStyle(fontSize: 28, color: Colors.white),
             ),
+            const SizedBox(height: 4),
             Text(
-              'frank@gmail.com',
+              _usuarioActual.correo,
               style: TextStyle(fontSize: 16, color: Colors.white),
             ),
           ],
@@ -72,7 +123,6 @@ class CustomNavigationDrawer extends StatelessWidget {
           title: const Text('Inicio'),
           onTap: () {
             Navigator.pop(context);
-            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => InicioPage()));
           },
         ),
         ListTile(
@@ -80,7 +130,9 @@ class CustomNavigationDrawer extends StatelessWidget {
           title: const Text('Registro'),
           onTap: () {
             Navigator.pop(context);
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => RegistroPage()));
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => RegistroPage()),
+            );
           },
         ),
         ListTile(
@@ -88,7 +140,9 @@ class CustomNavigationDrawer extends StatelessWidget {
           title: const Text('Pesaje'),
           onTap: () {
             Navigator.pop(context);
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => PesajePage()));
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => PesajePage()),
+            );
           },
         ),
         ListTile(
@@ -96,7 +150,9 @@ class CustomNavigationDrawer extends StatelessWidget {
           title: const Text('Producción de leche'),
           onTap: () {
             Navigator.pop(context);
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProducciondelechePage()));
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => ProducciondelechePage()),
+            );
           },
         ),
         ListTile(
@@ -104,7 +160,9 @@ class CustomNavigationDrawer extends StatelessWidget {
           title: const Text('Engorda'),
           onTap: () {
             Navigator.pop(context);
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => EngordaPage()));
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => EngordaPage()),
+            );
           },
         ),
         ListTile(
@@ -112,40 +170,50 @@ class CustomNavigationDrawer extends StatelessWidget {
           title: const Text('Vacunación'),
           onTap: () {
             Navigator.pop(context);
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => VacunacionPage()));
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => VacunacionPage()),
+            );
           },
         ),
         const Divider(color: Colors.black54),
         ListTile(
           leading: const Icon(Icons.account_balance),
-          title: const Text('Raza'),
+          title: const Text('Razas'),
           onTap: () {
             Navigator.pop(context);
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => RazaPage()));
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => RazaPage()),
+            );
           },
         ),
         ListTile(
           leading: const Icon(Icons.yard_outlined),
-          title: const Text('Origen'),
+          title: const Text('Ranchos'),
           onTap: () {
             Navigator.pop(context);
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => OrigenPage()));
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => RanchoPage()),
+            );
           },
         ),
         ListTile(
           leading: const Icon(Icons.account_balance_wallet_outlined),
-          title: const Text('Padre'),
+          title: const Text('Medicamentos'),
           onTap: () {
             Navigator.pop(context);
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => PadrePage()));
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => MedicamentosPage()),
+            );
           },
         ),
         ListTile(
           leading: const Icon(Icons.add_a_photo_rounded),
-          title: const Text('Madre'),
+          title: const Text('Trabajadores'),
           onTap: () {
             Navigator.pop(context);
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => MadrePage()));
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => TrabajadoresPage()),
+            );
           },
         ),
         const Divider(color: Colors.black54),
@@ -154,15 +222,19 @@ class CustomNavigationDrawer extends StatelessWidget {
           title: const Text('¿Quienes Somos?'),
           onTap: () {
             Navigator.pop(context);
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => QuienesomosPage()));
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => QuienesomosPage()),
+            );
           },
-        ),  
+        ),
         ListTile(
           leading: const Icon(Icons.work_outline_sharp),
           title: const Text('Contactos'),
           onTap: () {
             Navigator.pop(context);
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => ContactosPage()));
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => ContactosPage()),
+            );
           },
         ),
       ],

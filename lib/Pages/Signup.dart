@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter/foundation.dart'; // ← AÑADE ESTA IMPORTACIÓN
+import 'package:flutter/foundation.dart'; 
 import 'package:ganabo/Widgets/Header.dart';
 import 'package:ganabo/Widgets/Logo.dart';
 import 'package:ganabo/Widgets/TextFieldCustom.dart';
@@ -13,13 +13,10 @@ class SignUpPage extends StatefulWidget {
   State<SignUpPage> createState() => _SignUpPageState();
 }
 
-// ← AÑADE ESTA FUNCIÓN FUERA DE LA CLASE
 String getApiUrl(String endpoint) {
-  // Para WEB: Usar HTTPS
   if (kIsWeb) {
     return 'https://ganabovino.atwebpages.com/api/$endpoint.php';
   }
-  // Para MÓVIL: Usar HTTP
   else {
     return 'http://ganabovino.atwebpages.com/api/$endpoint.php';
   }
@@ -32,11 +29,10 @@ class _SignUpPageState extends State<SignUpPage> {
   bool isLoading = false;
 
   Future<void> registrarUsuario() async {
-    // ← USA LA FUNCIÓN getApiUrl EN LUGAR DE LA URL FIJA
     final url = Uri.parse(getApiUrl('registro'));
     
-    print('🌐 URL usada: $url'); // ← PARA DEBUG
-    print('📱 Plataforma: ${kIsWeb ? 'WEB' : 'MÓVIL'}'); // ← PARA DEBUG
+    print('🌐 URL usada: $url'); 
+    print('📱 Plataforma: ${kIsWeb ? 'WEB' : 'MÓVIL'}'); 
 
     setState(() {
       isLoading = true;
@@ -56,27 +52,26 @@ class _SignUpPageState extends State<SignUpPage> {
         }),
       );
 
-      print('✅ Response status: ${response.statusCode}');
-      print('✅ Response body: ${response.body}');
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
 
       final responseData = jsonDecode(response.body);
       
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (responseData['success'] == true) {
-          // Éxito
+          // Aqui mostramos el mensaje de exito del registro 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Registro exitoso!'))
           );
-          // ← OPCIONAL: Redirigir al login después de registro exitoso
           Navigator.pushReplacementNamed(context, 'Login');
         } else {
-          // Error del servidor
+          // Mandamos un mensaje de error por si falla 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(responseData['message'] ?? 'Error en el registro'))
           );
         }
       } else {
-        // Error HTTP
+        // Mandamos un mensaje de error por si falla con el http
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: ${response.statusCode}'))
         );

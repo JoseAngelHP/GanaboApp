@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:ganabo/Pages/Inicio.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter/foundation.dart'; // ← AÑADE ESTA IMPORTACIÓN
+import 'package:flutter/foundation.dart'; 
 import 'package:ganabo/Widgets/Header.dart';
 import 'package:ganabo/Widgets/Logo.dart';
 import 'package:ganabo/Widgets/TextFieldCustom.dart';
@@ -13,13 +14,10 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-// ← AÑADE ESTA FUNCIÓN FUERA DE LA CLASE
 String getApiUrl(String endpoint) {
-  // Para WEB: Usar HTTPS con Vercel
   if (kIsWeb) {
     return 'https://ganabovino.atwebpages.com/api/$endpoint.php';
   }
-  // Para MÓVIL: Usar HTTP directo
   else {
     return 'http://ganabovino.atwebpages.com/api/$endpoint.php';
   }
@@ -31,7 +29,7 @@ class _LoginPageState extends State<LoginPage> {
   bool isLoading = false;
  
   Future<void> iniciarSesion() async { 
-    // Validar campos
+    // Aqui validamos los campos
     if (correoController.text.isEmpty || contrasenaController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Por favor, complete todos los campos')),
@@ -43,11 +41,10 @@ class _LoginPageState extends State<LoginPage> {
       isLoading = true;
     });
 
-    // ← URL DINÁMICA QUE FUNCIONA EN WEB Y MÓVIL
     final url = Uri.parse(getApiUrl('login'));
     
-    print('🌐 URL usada: $url'); // ← PARA DEBUG
-    print('📱 Plataforma: ${kIsWeb ? 'WEB' : 'MÓVIL'}'); // ← PARA DEBUG
+    print('🌐 URL usada: $url'); 
+    print('📱 Plataforma: ${kIsWeb ? 'WEB' : 'MÓVIL'}'); 
 
     try {
       final response = await http.post(
@@ -69,25 +66,30 @@ class _LoginPageState extends State<LoginPage> {
       
       if (response.statusCode == 200) {
         if (responseData['success'] == true) {
-          // Login exitoso
+          // Aqui mandamos un mensaje de login exitoso
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('¡Inicio de sesión exitoso!'))
           );
-          // Navegar a la pantalla principal
-          Navigator.pushReplacementNamed(context, 'Home');
+          // Aqui nos dirigimos a la pantalla principal
+          Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => InicioPage(userData: responseData['user']), // Aqui pasamos los datos del usuario
+          ),
+        );
         } else {
-          // Error del servidor (credenciales incorrectas)
+          // Aqui mandaremos un mensaje de error cuando las credenciales sean incorrectas
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(responseData['message'] ?? 'Error en el login'))
           );
         }
       } else if (response.statusCode == 401) {
-        // No autorizado
+        // Aqui mostrara el mensaje de error
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(responseData['message'] ?? 'Credenciales incorrectas'))
         );
       } else {
-        // Error HTTP
+        // Aqui mostrara si hay un error de http
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: ${response.statusCode}'))
         );

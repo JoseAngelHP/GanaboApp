@@ -1243,6 +1243,7 @@ com.example.ganabo:attr/reverseLayout = 0x7f030128
 com.example.ganabo:interpolator/btn_checkbox_unchecked_mtrl_animation_interpolator_0 = 0x7f0a0002
 com.example.ganabo:attr/disableDependentsState = 0x7f030087
 com.example.ganabo:attr/ratingBarStyleSmall = 0x7f030127
+com.example.ganabo:xml/network_security_config = 0x7f100003
 com.example.ganabo:attr/ratingBarStyleIndicator = 0x7f030126
 com.example.ganabo:style/Widget.AppCompat.Light.ActionBar.Solid = 0x7f0e0150
 com.example.ganabo:id/accessibility_custom_action_31 = 0x7f080020

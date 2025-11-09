@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-//import 'package:ganabo/Pages/Home.dart';
-//import 'package:ganabo/main.dart';
 
 class QuienesomosPage extends StatelessWidget {
   const QuienesomosPage({Key? key}) : super(key: key);
@@ -8,18 +6,16 @@ class QuienesomosPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: Colors.grey[350],
-    //drawer: NavigationDrawer(),
     appBar: AppBar(
       title: const Text("¿Quienes Somos?"),
       backgroundColor: Colors.yellow[100],
     ),
     body: Column(
       children: [
-        // TextView equivalente (arriba de la imagen)
         Container(
-          margin: const EdgeInsets.all(16.0), // Margen opcional
+          margin: const EdgeInsets.all(16.0), 
           child: const Text(
-            "HISTORIA GANADERA", // Tu texto aquí
+            "HISTORIA GANADERA", 
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -27,7 +23,6 @@ class QuienesomosPage extends StatelessWidget {
             ),
           ),
         ),
-        // ImageView con fitXY
         InteractiveViewer(
           boundaryMargin: const EdgeInsets.all(20.0),
           minScale: 0.1,
@@ -37,7 +32,7 @@ class QuienesomosPage extends StatelessWidget {
             height: 574,
             child: Image.asset(
               'Icons/histogana.png',
-              fit: BoxFit.fill, // fitXY
+              fit: BoxFit.fill, 
             ),
           ),
         ),

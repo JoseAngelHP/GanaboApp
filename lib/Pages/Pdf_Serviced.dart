@@ -6,7 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
 
 class PdfServiced {
-  // Método para formatear fecha desde BD
+  // Aqui ponemos el formato de la fecha
   String _formatearFechaDesdeBD(String fechaBD) {
     try {
       if (fechaBD.contains(' ')) {
@@ -26,7 +26,7 @@ class PdfServiced {
     }
   }
 
-  // Generar PDF y obtener bytes
+  // Aqui generamos el pdf y obtenemos los bytes
   Future<Uint8List> generarPdfBytes(List<dynamic> registros) async {
     final pdf = pw.Document();
 
@@ -35,7 +35,7 @@ class PdfServiced {
         pageFormat: PdfPageFormat.a4,
         build: (pw.Context context) {
           return [
-            // Encabezado
+            // Aqui ponemos el encabezado de la hoja
             pw.Header(
               level: 0,
               child: pw.Text(
@@ -48,7 +48,7 @@ class PdfServiced {
             ),
             pw.SizedBox(height: 20),
             
-            // Información del reporte
+            // Aqui ponemos la informacion del reporte
             pw.Row(
               children: [
                 pw.Text('Fecha de generación: ',
@@ -66,7 +66,7 @@ class PdfServiced {
             ),
             pw.SizedBox(height: 20),
 
-            // Tabla de producción de leche
+            // Aqui ponemos la tabla de producción de leche
             pw.TableHelper.fromTextArray(
               context: context,
               border: pw.TableBorder.all(),
@@ -75,19 +75,17 @@ class PdfServiced {
               cellAlignment: pw.Alignment.centerLeft,
               headerAlignment: pw.Alignment.center,
               data: [
-                ['N° Arete', 'Fecha Ordeño', 'Cantidad (L)', 'Calidad', 'Persona a Cargo', 'Observaciones'],
+                ['N° Arete', 'Fecha Ordeño', 'Cantidad (L)', 'Rancho', 'Persona a Cargo', 'Observaciones'],
                 ...registros.map((registro) => [
                   registro['numero_arete']?.toString() ?? 'N/A',
                   _formatearFechaDesdeBD(registro['fecha_ordeño']?.toString() ?? 'N/A'),
                   registro['cantidad_leche']?.toString() ?? 'N/A',
-                  registro['calidad_leche']?.toString() ?? 'N/A',
+                  registro['rancho_asig']?.toString() ?? 'N/A',
                   registro['persona_cargo']?.toString() ?? 'N/A',
                   registro['observaciones']?.toString() ?? 'N/A',
                 ]).toList(),
               ],
             ),
-            
-            // Resumen estadístico
             _crearResumenEstadistico(registros),
           ];
         },
@@ -97,7 +95,6 @@ class PdfServiced {
     return pdf.save();
   }
 
-  // Crear resumen estadístico
   pw.Widget _crearResumenEstadistico(List<dynamic> registros) {
 
     return pw.Column(
@@ -105,13 +102,13 @@ class PdfServiced {
     );
   }
 
-  // Guardar PDF en dispositivo y abrirlo
+  // Aqui guardamos el pdf y lo abrimos
   Future<void> guardarYAbrirPdf(List<dynamic> registros, String fileName) async {
     try {
-      // Generar bytes del PDF
+      // Aqui generamos los bytes del pdf
       final bytes = await generarPdfBytes(registros);
       
-      // Obtener directorio de descargas
+      // Aqui agregamos el directorio de descargas
       final directory = await getExternalStorageDirectory();
       final path = directory?.path;
       
@@ -119,20 +116,19 @@ class PdfServiced {
         throw Exception('No se pudo acceder al almacenamiento');
       }
       
-      // Crear archivo
+      // Aqui creamos el archivo
       final file = File('$path/$fileName.pdf');
       await file.writeAsBytes(bytes);
       
-      // Abrir archivo
+      // Aqui abrimos el archivo
       await OpenFile.open(file.path);
       
     } catch (e) {
-      // Si falla con almacenamiento externo, intentar con documentos
       await guardarPdfEnDocumentos(registros, fileName);
     }
   }
 
-  // Alternativa para guardar en directorio de documentos
+  // Aqui agregamos una opcion para guardar en documentos
   Future<void> guardarPdfEnDocumentos(List<dynamic> registros, String fileName) async {
     try {
       final bytes = await generarPdfBytes(registros);

@@ -2,21 +2,20 @@
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 
-// Configuración de la base de datos
-$servidor = "fdb1033.awardspace.net";
-$usuario = "4685324_ganabo";     // ← Cambia por tu usuario
-$password = "Angelito123";   // ← Cambia por tu password
-$basedatos = "4685324_ganabo";        // ← Cambia por el nombre de tu BD
+$servidor = "fdb1033.awardspace.net";//Aqui ponemos el servidor de la base de datos
+$usuario = "4685324_ganabo"; //Aqui ponemos el usuario de la base de datos
+$password = "Angelito123"; //Aqui ponemos la contraseña de la base de datos
+$basedatos = "4685324_ganabo"; //Aqui ponemos el nombre de la base de datos
 
-// Crear conexión
+// Aqui creamos la conexión
 $conexion = new mysqli($servidor, $usuario, $password, $basedatos);
 
-// Verificar conexión
+// Aqui verificamos la conexión
 if ($conexion->connect_error) {
     die("Error de conexión: " . $conexion->connect_error);
 }
 
-// Consulta para obtener la madre
+// Aqui hacemos la consulta para obtener la madre
 $sql = "SELECT nombre_madre FROM madre";
 $resultado = $conexion->query($sql);
 

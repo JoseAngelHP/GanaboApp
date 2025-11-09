@@ -4,7 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 class ContactosPage extends StatelessWidget {
   const ContactosPage({Key? key}) : super(key: key);
 
-  // Función para abrir enlaces
+  // Aqui agregamos una función para abrir enlaces
   Future<void> _launchURL(String url) async {
     if (await canLaunch(url)) {
       await launch(url);
@@ -13,12 +13,12 @@ class ContactosPage extends StatelessWidget {
     }
   }
 
-  // Función para abrir correo electrónico
+  // Aqui agregamos una función para abrir nuestro correo electrónico
   Future<void> _launchEmail() async {
     final Uri params = Uri(
       scheme: 'mailto',
       path: 'ganabodemo@gmail.com',
-      query: 'subject=Consulta&body=Hola, me gustaría obtener más información', // Parámetros opcionales
+      query: 'subject=Consulta&body=Hola, me gustaría obtener más información', // Mensaje predeterminado
     );
 
     String url = params.toString();
@@ -53,35 +53,35 @@ class ContactosPage extends StatelessWidget {
             ),
             const SizedBox(height: 30),
             
-            // Tarjeta para Gmail
+            // Aqui agregamos la tarjeta para que nos mande a gmail
             Card(
               elevation: 4,
               margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               child: ListTile(
-                leading: Icon(Icons.email, color: Colors.red, size: 30), // Icono de Gmail
+                leading: Icon(Icons.email, color: Colors.red, size: 30), // Ponemos el icono de correo
                 title: const Text(
                   "Gmail",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 subtitle: const Text("ganabodemo@gmail.com"),
                 trailing: const Icon(Icons.arrow_forward_ios),
-                onTap: () => _launchEmail(), // Abre cliente de correo
+                onTap: () => _launchEmail(), // Redirecciona al usuario de correo
               ),
             ),
             
-            // Tarjeta para WhatsApp
+            // Aqui ponemos la tarjeta para whatsapp
             Card(
               elevation: 4,
               margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               child: ListTile(
-                leading: Icon(Icons.chat, color: Colors.green, size: 30), // Icono de WhatsApp
+                leading: Icon(Icons.chat, color: Colors.green, size: 30), // Ponemos el icono de mensajes
                 title: const Text(
                   "WhatsApp",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 subtitle: const Text("Grupo de la comunidad"),
                 trailing: const Icon(Icons.arrow_forward_ios),
-                onTap: () => _launchURL('https://chat.whatsapp.com/JVjWugehqta5W7ELwbYHLF'), // Abre enlace de WhatsApp
+                onTap: () => _launchURL('https://chat.whatsapp.com/JVjWugehqta5W7ELwbYHLF'), // Aqui abre el grupo de whatsapp
               ),
             ),
             

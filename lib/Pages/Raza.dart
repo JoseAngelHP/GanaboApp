@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter/foundation.dart'; // ← AÑADE ESTA IMPORTACIÓN
+import 'package:flutter/foundation.dart'; 
 
-// ← AÑADE ESTA FUNCIÓN FUERA DE LA CLASE
 String getApiUrl(String endpoint) {
-  // Para WEB: Usar HTTPS
   if (kIsWeb) {
     return 'https://ganabovino.atwebpages.com/api/$endpoint.php';
   }
-  // Para MÓVIL: Usar HTTP
   else {
     return 'http://ganabovino.atwebpages.com/api/$endpoint.php';
   }
@@ -23,7 +20,7 @@ class RazaPage extends StatefulWidget {
 }
 
 class _RazaPageState extends State<RazaPage> {
-  // Controladores para los TextFields
+  // Aqui agregamos los controladores para los textfields
   final TextEditingController _numeroAreteController = TextEditingController();
   final TextEditingController _pesoController = TextEditingController();
   final TextEditingController _colorPelajeController = TextEditingController();
@@ -31,10 +28,9 @@ class _RazaPageState extends State<RazaPage> {
   final TextEditingController _nombreRazaController = TextEditingController();
   final TextEditingController _alturaController = TextEditingController();
 
-  // Lista para almacenar las razas
   List<dynamic> _razas = [];
 
-  // Función para cargar razas desde la API
+  // Aqui cargamos las razas desde la api
   Future<void> _cargarRazas() async {
     try {
       final url = Uri.parse(getApiUrl('raza'));
@@ -75,7 +71,7 @@ class _RazaPageState extends State<RazaPage> {
             ),
             const SizedBox(height: 20),
             
-            // Campos del formulario...
+            // Aqui ponemos los campos del formulario
             TextField(
               controller: _numeroAreteController,
               keyboardType: TextInputType.number,
@@ -144,8 +140,6 @@ class _RazaPageState extends State<RazaPage> {
               ),
             ),
             const SizedBox(height: 30),
-            
-            // Botones
             _buildButtonRow(),
           ],
         ),
@@ -211,7 +205,7 @@ class _RazaPageState extends State<RazaPage> {
     );
   }
 
-  // VER LISTA - Navegar a lista de registros con diseño tabular
+  // Aqui vemos la lista en formato de tabla
   void _verLista() {
     _cargarRazas().then((_) {
       Navigator.of(context).push(
@@ -230,7 +224,7 @@ class _RazaPageState extends State<RazaPage> {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  // Encabezados de la tabla
+                  // Aqui ponemos el encabezados de la tabla
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.blueGrey[800],
@@ -319,7 +313,7 @@ class _RazaPageState extends State<RazaPage> {
                   ),
                   const SizedBox(height: 10),
 
-                  // Contenido de la tabla
+                  // Aqui ponemos el contenido de la tabla
                   Expanded(
                     child: _razas.isEmpty
                         ? Center(
@@ -352,7 +346,7 @@ class _RazaPageState extends State<RazaPage> {
                                 ),
                                 child: Row(
                                   children: [
-                                    // N° Arete
+                                    // Aqui ponemos el N° Arete
                                     Expanded(
                                       flex: 2,
                                       child: Text(
@@ -364,7 +358,7 @@ class _RazaPageState extends State<RazaPage> {
                                         ),
                                       ),
                                     ),
-                                    // Nombre Raza
+                                    // Aqui ponemos el Nombre de la Raza
                                     Expanded(
                                       flex: 2,
                                       child: Text(
@@ -375,7 +369,7 @@ class _RazaPageState extends State<RazaPage> {
                                         ),
                                       ),
                                     ),
-                                    // Peso
+                                    // Aqui ponemos el Peso
                                     Expanded(
                                       flex: 2,
                                       child: Text(
@@ -386,7 +380,7 @@ class _RazaPageState extends State<RazaPage> {
                                         ),
                                       ),
                                     ),
-                                    // Altura
+                                    // Aqui ponemos la Altura
                                     Expanded(
                                       flex: 2,
                                       child: Text(
@@ -397,7 +391,7 @@ class _RazaPageState extends State<RazaPage> {
                                         ),
                                       ),
                                     ),
-                                    // Color Pelaje
+                                    // Aqui ponemos el Color del Pelaje
                                     Expanded(
                                       flex: 2,
                                       child: Text(
@@ -408,7 +402,7 @@ class _RazaPageState extends State<RazaPage> {
                                         ),
                                       ),
                                     ),
-                                    // Región
+                                    // Aqui ponemos la Región
                                     Expanded(
                                       flex: 2,
                                       child: Text(
@@ -436,7 +430,7 @@ class _RazaPageState extends State<RazaPage> {
     });
   }
 
-  // Función para agregar raza
+  // Aqui agregamos la raza
   Future<void> _agregarRaza() async {
     if (!_validarCampos()) return;
 
@@ -468,7 +462,7 @@ class _RazaPageState extends State<RazaPage> {
     }
   }
 
-  // Función para consultar raza
+  // Aqui consultamos la raza
   Future<void> _consultarRaza() async {
     if (_numeroAreteController.text.isEmpty) {
       _mostrarMensaje('Ingrene el número de arete para consultar');
@@ -498,7 +492,7 @@ class _RazaPageState extends State<RazaPage> {
     }
   }
 
-  // Función para modificar raza
+  //Aqui modificamos la raza
   Future<void> _modificarRaza() async {
     if (_numeroAreteController.text.isEmpty) {
       _mostrarMensaje('Ingrene el número de arete para modificar');
@@ -532,7 +526,7 @@ class _RazaPageState extends State<RazaPage> {
     }
   }
 
-  // Función para eliminar raza
+  // Aqui eliminamos la raza
   Future<void> _eliminarRaza() async {
     if (_numeroAreteController.text.isEmpty) {
       _mostrarMensaje('Ingrene el número de arete para eliminar');
@@ -562,7 +556,7 @@ class _RazaPageState extends State<RazaPage> {
     }
   }
 
-  // Función para limpiar campos
+  // Aqui limpiamos los campos
   void _limpiarCampos() {
     setState(() {
       _numeroAreteController.clear();
@@ -574,7 +568,7 @@ class _RazaPageState extends State<RazaPage> {
     });
   }
 
-  // Función para validar campos
+  // Aqui validamos los campos
   bool _validarCampos() {
     if (_numeroAreteController.text.isEmpty ||
         _pesoController.text.isEmpty ||
@@ -588,7 +582,7 @@ class _RazaPageState extends State<RazaPage> {
     return true;
   }
 
-  // Función para mostrar mensajes
+  // Aqui mostramos los mensajes
   void _mostrarMensaje(String mensaje) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -600,7 +594,7 @@ class _RazaPageState extends State<RazaPage> {
 
   @override
   void dispose() {
-    // Limpiar los controladores
+    // Aqui limpiamos los controladores
     _numeroAreteController.dispose();
     _pesoController.dispose();
     _colorPelajeController.dispose();

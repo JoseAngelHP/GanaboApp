@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter/foundation.dart'; // ← AÑADE ESTA IMPORTACIÓN
+import 'package:flutter/foundation.dart'; 
 import 'package:intl/intl.dart';
 
-// ← AÑADE ESTA FUNCIÓN FUERA DE LA CLASE
 String getApiUrl(String endpoint) {
-  // Para WEB: Usar HTTPS
   if (kIsWeb) {
     return 'https://ganabovino.atwebpages.com/api/$endpoint.php';
   }
-  // Para MÓVIL: Usar HTTP
   else {
     return 'http://ganabovino.atwebpages.com/api/$endpoint.php';
   }
@@ -28,7 +25,7 @@ class _EngordaPageState extends State<EngordaPage> {
   List<Map<String, dynamic>> _animales = [];
   bool _isLoading = true;
 
-  // Controladores para los campos de texto
+  // Aqui agregamos los controladores para los campos de texto
   final TextEditingController _areteController = TextEditingController();
   final TextEditingController _fechaIngresoController = TextEditingController();
   final TextEditingController _pesoIngresoController = TextEditingController();
@@ -47,29 +44,29 @@ class _EngordaPageState extends State<EngordaPage> {
     _cargarAnimales();
   }
 
-  // Método para convertir fecha de formato dd/MM/yyyy a yyyy-MM-dd
+  // Agregamos el método para convertir la fecha
   String _convertirFechaFormato(String fecha) {
     if (fecha.isEmpty) return '';
 
     try {
-      // Intentar parsear la fecha en formato dd/MM/yyyy
+      // Aqui intentamos mandar la fecha
       final parts = fecha.split('/');
       if (parts.length == 3) {
         final day = int.parse(parts[0]);
         final month = int.parse(parts[1]);
         final year = int.parse(parts[2]);
 
-        // Formatear a yyyy-MM-dd
+        // Convertimos la fecha a formato de años,meses y dias
         return '${year.toString().padLeft(4, '0')}-${month.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}';
       }
     } catch (e) {
       print('Error al convertir fecha: $e');
     }
 
-    return fecha; // Si no se puede convertir, devolver la fecha original
+    return fecha; // En caso de error mandar la fecha en formato original
   }
 
-  // Método para formatear fecha de yyyy-MM-dd to dd/MM/yyyy para mostrar
+  // Mostramos la fecha en formato de años, meses y dias
   String _formatearFechaParaMostrar(String fecha) {
     if (fecha.isEmpty || fecha == '0000-00-00') return '';
 
@@ -85,7 +82,7 @@ class _EngordaPageState extends State<EngordaPage> {
     return fecha;
   }
 
-  // Método para cargar animales desde la API
+  // Aqui cargamos los animales desde nuestra api
   Future<void> _cargarAnimales() async {
     try {
       setState(() {
@@ -236,7 +233,7 @@ class _EngordaPageState extends State<EngordaPage> {
           lastDate: DateTime(2100),
         );
         if (picked != null) {
-          // Formatear la fecha como dd/MM/yyyy para mostrar
+          // Mandamos la fecha a formato de dias, meses y años
           controller.text = "${picked.day}/${picked.month}/${picked.year}";
         }
       },
@@ -332,7 +329,7 @@ class _EngordaPageState extends State<EngordaPage> {
       if (response.statusCode == 200) {
         _mostrarMensaje("Animal agregado correctamente");
         _limpiarCampos();
-        _cargarAnimales(); // Recargar la lista
+        _cargarAnimales(); // Aqui recargamos la lista de animales
       } else {
         _mostrarMensaje("Error al agregar animal: ${response.body}");
       }
@@ -396,7 +393,7 @@ class _EngordaPageState extends State<EngordaPage> {
 
       if (response.statusCode == 200) {
         _mostrarMensaje("Animal modificado correctamente");
-        _cargarAnimales(); // Recargar la lista
+        _cargarAnimales(); // Aqui recargamos la lista de animales
       } else {
         _mostrarMensaje("Error al modificar animal: ${response.body}");
       }
@@ -426,7 +423,7 @@ class _EngordaPageState extends State<EngordaPage> {
       if (response.statusCode == 200) {
         _mostrarMensaje("Animal eliminado correctamente");
         _limpiarCampos();
-        _cargarAnimales(); // Recargar la lista
+        _cargarAnimales(); // Aqui recargamos la lista de animales
       } else {
         _mostrarMensaje("Error al eliminar animal: ${response.body}");
       }
@@ -456,7 +453,7 @@ class _EngordaPageState extends State<EngordaPage> {
       return;
     }
 
-    // Navegar a la pantalla completa de tabla
+    // Aqui accesamos a la pantalla completa de la tabla
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -501,7 +498,7 @@ class _EngordaPageState extends State<EngordaPage> {
     }
   }
 
-  // Función para generar reporte en texto
+  // Aqui generamos el reporte de la tabla
   // ignore: unused_element
   void _generarReporteTexto() {
     String reporte =
@@ -524,7 +521,7 @@ class _EngordaPageState extends State<EngordaPage> {
       reporte += "Peso Salida: ${animal['peso_salida'] ?? 'N/A'} kg\n";
     }
 
-    // Mostrar el reporte en un nuevo diálogo
+    // Aqui mostramos el reporte
     _mostrarReporteTexto(reporte);
   }
 
@@ -589,7 +586,7 @@ class _EngordaPageState extends State<EngordaPage> {
 
   @override
   void dispose() {
-    // Limpiar los controladores cuando el widget se desmonte
+    // Aqui limpiamos los controladores
     _areteController.dispose();
     _fechaIngresoController.dispose();
     _pesoIngresoController.dispose();
@@ -603,7 +600,7 @@ class _EngordaPageState extends State<EngordaPage> {
   }
 }
 
-// Nueva pantalla para mostrar la tabla completa
+// Aqui mostramos la tabla completa
 class TablaEngordaScreen extends StatelessWidget {
   final List<Map<String, dynamic>> animales;
 
@@ -674,7 +671,7 @@ class TablaEngordaScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Encabezados de la tabla
+            // Aqui agregamos los encabezados de la tabla
             Container(
               decoration: BoxDecoration(
                 color: Colors.blueGrey[800],
@@ -799,7 +796,7 @@ class TablaEngordaScreen extends StatelessWidget {
             ),
             const SizedBox(height: 10),
 
-            // Contenido de la tabla
+            // Aqui agregamos el contenido de la tabla
             Expanded(
               child: animales.isEmpty
                   ? Center(
@@ -830,7 +827,7 @@ class TablaEngordaScreen extends StatelessWidget {
                           ),
                           child: Row(
                             children: [
-                              // N° Arete
+                              // Ponemos el N° Arete
                               Expanded(
                                 flex: 2,
                                 child: Text(
@@ -841,7 +838,7 @@ class TablaEngordaScreen extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              // Fecha Ingreso
+                              // Ponemos la Fecha de Ingreso
                               Expanded(
                                 flex: 2,
                                 child: Text(
@@ -854,7 +851,7 @@ class TablaEngordaScreen extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              // Peso Ingreso
+                              // Ponemos el Peso de Ingreso
                               Expanded(
                                 flex: 2,
                                 child: Text(
@@ -865,7 +862,7 @@ class TablaEngordaScreen extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              // Costo
+                              // Ponemos el Costo
                               Expanded(
                                 flex: 2,
                                 child: Text(
@@ -876,7 +873,7 @@ class TablaEngordaScreen extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              // Grupo
+                              // Ponemos el Grupo
                               Expanded(
                                 flex: 2,
                                 child: Text(
@@ -887,7 +884,7 @@ class TablaEngordaScreen extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              // Dieta
+                              // Ponemos la Dieta
                               Expanded(
                                 flex: 2,
                                 child: Text(
@@ -898,7 +895,7 @@ class TablaEngordaScreen extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              // Ganancia
+                              // Ponemos la Ganancia
                               Expanded(
                                 flex: 2,
                                 child: Text(
@@ -909,7 +906,7 @@ class TablaEngordaScreen extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              // Fecha Salida
+                              // Ponemos la Fecha de Salida
                               Expanded(
                                 flex: 2,
                                 child: Text(
@@ -922,7 +919,7 @@ class TablaEngordaScreen extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              // Peso Salida
+                              // Ponemos el Peso de Salida
                               Expanded(
                                 flex: 2,
                                 child: Text(

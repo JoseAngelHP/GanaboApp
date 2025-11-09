@@ -4,29 +4,25 @@ header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-// Configuración de la base de datos
-$servername = "fdb1033.awardspace.net";
-$username = "4685324_ganabo"; // Cambiar por tu usuario de MySQL
-$password = "Angelito123"; // Cambiar por tu contraseña de MySQL
-$dbname = "4685324_ganabo";
+$servername = "fdb1033.awardspace.net";//Aqui ponemos el servidor de la base de datos
+$username = "4685324_ganabo";//Aqui ponemos el usuario de la base de datos
+$password = "Angelito123";//Aqui ponemos la contraseña de la base de datos
+$dbname = "4685324_ganabo";//Aqui ponemos el nombre de la base de datos
 
-// Crear conexión
+// Aqui creamos la conexión
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Verificar conexión
+// Aqui verificamos la conexión
 if ($conn->connect_error) {
-    die(json_encode(array("message" => "Connection failed: " . $conn->connect_error)));
+    die(json_encode(array("success" => false, "message" => "Connection failed: " . $conn->connect_error)));
 }
 
-// Obtener el método de la solicitud
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Procesar según el método
 switch ($method) {
     case 'GET':
-        // Consultar registros
+        // Aqui consultamos el origen
         if (isset($_GET['numero_arete'])) {
-            // Consultar por número de arete
             $numero_arete = $_GET['numero_arete'];
             $sql = "SELECT * FROM origen WHERE numero_arete = ?";
             $stmt = $conn->prepare($sql);
@@ -36,13 +32,12 @@ switch ($method) {
             
             if ($result->num_rows > 0) {
                 $row = $result->fetch_assoc();
-                echo json_encode($row);
+                echo json_encode(array("success" => true, "data" => $row));
             } else {
                 http_response_code(404);
-                echo json_encode(array("message" => "No se encontró el origen con arete: " . $numero_arete));
+                echo json_encode(array("success" => false, "message" => "No se encontró el origen con arete: " . $numero_arete));
             }
         } else {
-            // Consultar todos los registros
             $sql = "SELECT * FROM origen ORDER BY id DESC";
             $result = $conn->query($sql);
             
@@ -52,28 +47,27 @@ switch ($method) {
                     $origenes[] = $row;
                 }
             }
-            echo json_encode($origenes);
+            echo json_encode(array("success" => true, "data" => $origenes));
         }
         break;
         
     case 'POST':
-        // Crear nuevo registro
+        // Aqui creamos un nuevo origen
         $data = json_decode(file_get_contents("php://input"), true);
         
-        // Validar campos requeridos
         if (!isset($data['numero_arete']) || !isset($data['nombre_dueno']) || 
-            !isset($data['nombre_finca']) || !isset($data['color_ganado'])) {
+            !isset($data['nombre_finca'])) {
             http_response_code(400);
-            echo json_encode(array("message" => "Todos los campos son requeridos: numero_arete, nombre_dueno, nombre_finca, color_ganado"));
+            echo json_encode(array("success" => false, "message" => "Campos requeridos: numero_arete, nombre_dueno, nombre_finca"));
             break;
         }
         
         $numero_arete = $data['numero_arete'];
         $nombre_dueno = $data['nombre_dueno'];
         $nombre_finca = $data['nombre_finca'];
-        $color_ganado = $data['color_ganado'];
+        $ext_hecta = isset($data['ext_hecta']) ? $data['ext_hecta'] : null;
+        $ubicacion_direccion = isset($data['ubicacion_direccion']) ? $data['ubicacion_direccion'] : null;
         
-        // Verificar si ya existe el número de arete
         $sql_check = "SELECT id FROM origen WHERE numero_arete = ?";
         $stmt_check = $conn->prepare($sql_check);
         $stmt_check->bind_param("s", $numero_arete);
@@ -82,45 +76,45 @@ switch ($method) {
         
         if ($result_check->num_rows > 0) {
             http_response_code(409);
-            echo json_encode(array("message" => "Ya existe un registro con el número de arete: " . $numero_arete));
+            echo json_encode(array("success" => false, "message" => "Ya existe un registro con el número de arete: " . $numero_arete));
             break;
         }
         
-        $sql = "INSERT INTO origen (numero_arete, nombre_dueno, nombre_finca, color_ganado) 
-                VALUES (?, ?, ?, ?)";
+        $sql = "INSERT INTO origen (numero_arete, nombre_dueno, nombre_finca, ext_hecta, ubicacion_direccion) 
+                VALUES (?, ?, ?, ?, ?)";
         
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssss", $numero_arete, $nombre_dueno, $nombre_finca, $color_ganado);
+        $stmt->bind_param("sssds", $numero_arete, $nombre_dueno, $nombre_finca, $ext_hecta, $ubicacion_direccion);
         
         if ($stmt->execute()) {
             http_response_code(201);
             echo json_encode(array(
+                "success" => true,
                 "message" => "Origen creado exitosamente", 
                 "numero_arete" => $numero_arete
             ));
         } else {
             http_response_code(500);
-            echo json_encode(array("message" => "Error al crear registro: " . $conn->error));
+            echo json_encode(array("success" => false, "message" => "Error al crear registro: " . $conn->error));
         }
         break;
         
     case 'PUT':
-        // Actualizar registro existente por número de arete
+        // Aqui actualizamos el origen
         $data = json_decode(file_get_contents("php://input"), true);
         
-        // Validar campos requeridos
         if (!isset($data['numero_arete'])) {
             http_response_code(400);
-            echo json_encode(array("message" => "El campo numero_arete es requerido para actualizar"));
+            echo json_encode(array("success" => false, "message" => "El campo numero_arete es requerido para actualizar"));
             break;
         }
         
         $numero_arete = $data['numero_arete'];
         $nombre_dueno = isset($data['nombre_dueno']) ? $data['nombre_dueno'] : null;
         $nombre_finca = isset($data['nombre_finca']) ? $data['nombre_finca'] : null;
-        $color_ganado = isset($data['color_ganado']) ? $data['color_ganado'] : null;
+        $ext_hecta = isset($data['ext_hecta']) ? $data['ext_hecta'] : null;
+        $ubicacion_direccion = isset($data['ubicacion_direccion']) ? $data['ubicacion_direccion'] : null;
         
-        // Verificar si existe el número de arete
         $sql_check = "SELECT id FROM origen WHERE numero_arete = ?";
         $stmt_check = $conn->prepare($sql_check);
         $stmt_check->bind_param("s", $numero_arete);
@@ -129,11 +123,10 @@ switch ($method) {
         
         if ($result_check->num_rows === 0) {
             http_response_code(404);
-            echo json_encode(array("message" => "No se encontró el origen con arete: " . $numero_arete));
+            echo json_encode(array("success" => false, "message" => "No se encontró el origen con arete: " . $numero_arete));
             break;
         }
         
-        // Construir consulta dinámica
         $fields = array();
         $types = "";
         $values = array();
@@ -148,15 +141,20 @@ switch ($method) {
             $types .= "s";
             $values[] = $nombre_finca;
         }
-        if ($color_ganado !== null) {
-            $fields[] = "color_ganado = ?";
+        if ($ext_hecta !== null) {
+            $fields[] = "ext_hecta = ?";
+            $types .= "d";
+            $values[] = $ext_hecta;
+        }
+        if ($ubicacion_direccion !== null) {
+            $fields[] = "ubicacion_direccion = ?";
             $types .= "s";
-            $values[] = $color_ganado;
+            $values[] = $ubicacion_direccion;
         }
         
         if (empty($fields)) {
             http_response_code(400);
-            echo json_encode(array("message" => "No se proporcionaron campos para actualizar"));
+            echo json_encode(array("success" => false, "message" => "No se proporcionaron campos para actualizar"));
             break;
         }
         
@@ -166,33 +164,32 @@ switch ($method) {
         $sql = "UPDATE origen SET " . implode(", ", $fields) . " WHERE numero_arete = ?";
         $stmt = $conn->prepare($sql);
         
-        // Enlazar parámetros dinámicamente
         $stmt->bind_param($types, ...$values);
         
         if ($stmt->execute()) {
             echo json_encode(array(
+                "success" => true,
                 "message" => "Origen actualizado exitosamente",
                 "numero_arete" => $numero_arete
             ));
         } else {
             http_response_code(500);
-            echo json_encode(array("message" => "Error al actualizar registro: " . $conn->error));
+            echo json_encode(array("success" => false, "message" => "Error al actualizar registro: " . $conn->error));
         }
         break;
         
     case 'DELETE':
-        // Eliminar registro por número de arete
+        // Aqui eliminamos el origen
         $data = json_decode(file_get_contents("php://input"), true);
         
         if (!isset($data['numero_arete'])) {
             http_response_code(400);
-            echo json_encode(array("message" => "El campo numero_arete es requerido para eliminar"));
+            echo json_encode(array("success" => false, "message" => "El campo numero_arete es requerido para eliminar"));
             break;
         }
         
         $numero_arete = $data['numero_arete'];
         
-        // Verificar si existe el número de arete
         $sql_check = "SELECT id FROM origen WHERE numero_arete = ?";
         $stmt_check = $conn->prepare($sql_check);
         $stmt_check->bind_param("s", $numero_arete);
@@ -201,7 +198,7 @@ switch ($method) {
         
         if ($result_check->num_rows === 0) {
             http_response_code(404);
-            echo json_encode(array("message" => "No se encontró el origen con arete: " . $numero_arete));
+            echo json_encode(array("success" => false, "message" => "No se encontró el origen con arete: " . $numero_arete));
             break;
         }
         
@@ -211,22 +208,21 @@ switch ($method) {
         
         if ($stmt->execute()) {
             echo json_encode(array(
+                "success" => true,
                 "message" => "Origen eliminado exitosamente",
                 "numero_arete" => $numero_arete
             ));
         } else {
             http_response_code(500);
-            echo json_encode(array("message" => "Error al eliminar registro: " . $conn->error));
+            echo json_encode(array("success" => false, "message" => "Error al eliminar registro: " . $conn->error));
         }
         break;
         
     default:
-        // Método no permitido
         http_response_code(405);
-        echo json_encode(array("message" => "Método no permitido"));
+        echo json_encode(array("success" => false, "message" => "Método no permitido"));
         break;
 }
 
-// Cerrar conexión
 $conn->close();
 ?>

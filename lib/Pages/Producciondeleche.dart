@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
-// Función para obtener la URL de la API
 String getApiUrl(String endpoint) {
   if (kIsWeb) {
     return 'https://ganabovino.atwebpages.com/api/$endpoint.php';
@@ -25,40 +24,103 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
   final TextEditingController _numeroAreteController = TextEditingController();
   final TextEditingController _fechaController = TextEditingController();
   final TextEditingController _cantidadController = TextEditingController();
-  final TextEditingController _calidadController = TextEditingController();
-  final TextEditingController _personaController = TextEditingController();
   final TextEditingController _observacionesController = TextEditingController();
+
+  String? _selectedRancho;
+  String? _selectedTrabajador;
 
   List<Map<String, dynamic>> _producciones = [];
   bool _isLoading = false;
-  String _fechaOriginal = ''; // ← NUEVA VARIABLE PARA GUARDAR LA FECHA ORIGINAL
+  String _fechaOriginal = '';
 
-  // Headers para las peticiones HTTP
+  List<String> _ranchos = [];
+  List<String> _trabajadores = [];
+
   static const Map<String, String> headers = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   };
 
-  // Función para mostrar mensajes
+  @override
+  void initState() {
+    super.initState();
+    _cargarRanchos();
+    _cargarTrabajadores();
+  }
+
+  // Aqui cargamos los ranchos desde la tabla origen
+  Future<void> _cargarRanchos() async {
+    try {
+      final url = Uri.parse(getApiUrl('origen'));
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData['success'] == true) {
+          final List<dynamic> origenes = responseData['data'] ?? [];
+          final nombresFincas = origenes
+              .map<String>((origen) => origen['nombre_finca']?.toString() ?? '')
+              .where((nombre) => nombre.isNotEmpty)
+              .toSet() 
+              .toList();
+          
+          nombresFincas.sort();
+          
+          setState(() {
+            _ranchos = nombresFincas;
+          });
+        }
+      }
+    } catch (e) {
+      print('Error al cargar ranchos: $e');
+    }
+  }
+
+  // Aqui cargamos a los trabajadores desde la tabla trabajadores
+  Future<void> _cargarTrabajadores() async {
+    try {
+      final url = Uri.parse(getApiUrl('trabajadores'));
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData['success'] == true) {
+          final List<dynamic> trabajadoresData = responseData['data'] ?? [];
+          final nombresTrabajadores = trabajadoresData
+              .map<String>((trabajador) => trabajador['nombre_completo']?.toString() ?? '')
+              .where((nombre) => nombre.isNotEmpty)
+              .toList();
+          
+          nombresTrabajadores.sort();
+          
+          setState(() {
+            _trabajadores = nombresTrabajadores;
+          });
+        }
+      }
+    } catch (e) {
+      print('Error al cargar trabajadores: $e');
+    }
+  }
+
+  // Aqui hacemos una función para mostrar los mensajes
   void _mostrarMensaje(String mensaje) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(mensaje)),
     );
   }
 
-  // Función para limpiar campos
+  // Aqui hacemos una función para limpiar los campos
   void _limpiarCampos() {
     _numeroAreteController.clear();
     _fechaController.clear();
     _cantidadController.clear();
-    _calidadController.clear();
-    _personaController.clear();
     _observacionesController.clear();
-    _fechaOriginal = ''; // ← Limpiar también la fecha original
+    _fechaOriginal = '';
+    _selectedRancho = null;
+    _selectedTrabajador = null;
     _mostrarMensaje('Campos limpiados');
   }
 
-  // Función para seleccionar fecha
+  // Aqui hacemos una función para seleccionar la fecha
   Future<void> _seleccionarFecha() async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -74,20 +136,20 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
     }
   }
 
-  // Función para validar campos obligatorios
+  // Aqui hacemos una función para validar los campos obligatorios
   bool _validarCampos() {
     if (_numeroAreteController.text.isEmpty ||
         _fechaController.text.isEmpty ||
         _cantidadController.text.isEmpty ||
-        _calidadController.text.isEmpty ||
-        _personaController.text.isEmpty) {
+        _selectedRancho == null ||
+        _selectedTrabajador == null) {
       _mostrarMensaje('Por favor, complete todos los campos obligatorios');
       return false;
     }
     return true;
   }
 
-  // AGREGAR - Crear nuevo registro
+  // Aqui agregamos un nuevo registro
   Future<void> _agregarRegistro() async {
     if (!_validarCampos()) return;
 
@@ -100,8 +162,8 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
         'numero_arete': _numeroAreteController.text,
         'fecha_ordeño': _fechaController.text,
         'cantidad_leche': double.parse(_cantidadController.text),
-        'calidad_leche': _calidadController.text,
-        'persona_cargo': _personaController.text,
+        'rancho_asig': _selectedRancho!, 
+        'persona_cargo': _selectedTrabajador!, 
         'observaciones': _observacionesController.text.isNotEmpty 
             ? _observacionesController.text 
             : '',
@@ -129,7 +191,7 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
     }
   }
 
-  // CONSULTAR - Buscar por número de arete
+  // Aqui consultamos el registro por su numero de arete
   Future<void> _consultarRegistro() async {
     if (_numeroAreteController.text.isEmpty) {
       _mostrarMensaje('Ingrese el número de arete para consultar');
@@ -147,18 +209,20 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data is List && data.isNotEmpty) {
-          // Ordenar por fecha y mostrar el último registro
+          // Aqui mostramos el registro con ese arete
           data.sort((a, b) => b['fecha_ordeño'].compareTo(a['fecha_ordeño']));
           final ultimoRegistro = data[0];
           
-          // GUARDAR LA FECHA ORIGINAL ← NUEVO
           _fechaOriginal = ultimoRegistro['fecha_ordeño'] ?? '';
           
           _fechaController.text = ultimoRegistro['fecha_ordeño'] ?? '';
           _cantidadController.text = ultimoRegistro['cantidad_leche']?.toString() ?? '';
-          _calidadController.text = ultimoRegistro['calidad_leche'] ?? '';
-          _personaController.text = ultimoRegistro['persona_cargo'] ?? '';
           _observacionesController.text = ultimoRegistro['observaciones'] ?? '';
+          
+          setState(() {
+            _selectedRancho = ultimoRegistro['rancho_asig'] ?? '';
+            _selectedTrabajador = ultimoRegistro['persona_cargo'] ?? '';
+          });
           
           _mostrarMensaje('Registro cargado correctamente');
         } else {
@@ -176,11 +240,10 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
     }
   }
 
-  // MODIFICAR - Actualizar registro (CORREGIDO)
+  // Aqui modificamos el registro
   Future<void> _modificarRegistro() async {
     if (!_validarCampos()) return;
 
-    // Verificar que se haya consultado primero un registro
     if (_fechaOriginal.isEmpty) {
       _mostrarMensaje('Primero consulte un registro para modificar');
       return;
@@ -193,11 +256,11 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
     try {
       final registro = {
         'numero_arete': _numeroAreteController.text,
-        'fecha_original': _fechaOriginal, // ← FECHA ORIGINAL (la que tenía cuando consultaste)
-        'fecha_ordeño': _fechaController.text, // ← NUEVA FECHA (puede ser diferente)
+        'fecha_original': _fechaOriginal,
+        'fecha_ordeño': _fechaController.text,
         'cantidad_leche': double.parse(_cantidadController.text),
-        'calidad_leche': _calidadController.text,
-        'persona_cargo': _personaController.text,
+        'rancho_asig': _selectedRancho, 
+        'persona_cargo': _selectedTrabajador, 
         'observaciones': _observacionesController.text.isNotEmpty 
             ? _observacionesController.text 
             : '',
@@ -212,7 +275,6 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
 
       if (response.statusCode == 200) {
         _mostrarMensaje('Registro modificado correctamente');
-        // Actualizar la fecha original por si quieres modificar again
         _fechaOriginal = _fechaController.text;
       } else {
         _mostrarMensaje('Error al modificar: ${response.statusCode}');
@@ -226,7 +288,7 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
     }
   }
 
-  // ELIMINAR - Borrar registro
+  // Aqui eliminamos el registro
   Future<void> _eliminarRegistro() async {
     if (_numeroAreteController.text.isEmpty || _fechaController.text.isEmpty) {
       _mostrarMensaje('Ingrese número de arete y fecha para eliminar');
@@ -238,7 +300,6 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
     });
 
     try {
-      // Usar parámetros GET para mejor compatibilidad
       final numeroArete = Uri.encodeComponent(_numeroAreteController.text);
       final fecha = Uri.encodeComponent(_fechaController.text);
       final url = Uri.parse("${getApiUrl('produccion')}?numero_arete=$numeroArete&fecha_ordeño=$fecha");
@@ -260,7 +321,7 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
     }
   }
 
-  // CARGAR PRODUCCIONES - Obtener todos los registros
+  // Aqui obtenemos los registros
   Future<void> _cargarProducciones() async {
     setState(() {
       _isLoading = true;
@@ -287,14 +348,14 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
     }
   }
 
-  // GENERAR PDF
+  // Aqui generamos el pdf
   Future<void> _generarPDF() async {
     setState(() {
       _isLoading = true;
     });
 
     try {
-      // Cargar los datos primero
+      // Aqui cargamos los datos
       await _cargarProducciones();
       
       if (_producciones.isEmpty) {
@@ -302,10 +363,9 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
         return;
       }
       
-      // Crear instancia del servicio PDF
       final pdfService = PdfServiced();
       
-      // Generar y abrir PDF
+      // Aqui generamos y abrimos el pdf
       await pdfService.guardarYAbrirPdf(
         _producciones,
         'Reporte_Produccion_Leche_${DateTime.now().millisecondsSinceEpoch}'
@@ -321,7 +381,7 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
     }
   }
 
-  // VER LISTA - Navegar a lista de registros
+  // Aqui vemos la lista de los registros
   void _verLista() {
     _cargarProducciones().then((_) {
       Navigator.of(context).push(
@@ -340,7 +400,7 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  // Encabezados de la tabla
+                  // Aqui agregamos los encabezados de la tabla 
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.blueGrey[800],
@@ -391,7 +451,7 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
                         Expanded(
                           flex: 2,
                           child: Text(
-                            'CALIDAD',
+                            'RANCHO', 
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -403,7 +463,7 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
                         Expanded(
                           flex: 2,
                           child: Text(
-                            'PERSONA CARGO',
+                            'TRABAJADOR', 
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -429,7 +489,7 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
                   ),
                   const SizedBox(height: 10),
 
-                  // Contenido de la tabla
+                  // Aqui ponemos el contenido de la tabla
                   Expanded(
                     child: _producciones.isEmpty
                         ? Center(
@@ -462,7 +522,7 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
                                 ),
                                 child: Row(
                                   children: [
-                                    // N° Arete
+                                    // Aqui ponemos el N° Arete
                                     Expanded(
                                       flex: 2,
                                       child: Text(
@@ -473,7 +533,7 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
                                         ),
                                       ),
                                     ),
-                                    // Fecha Ordeño
+                                    // Aqui ponemos la Fecha de Ordeño
                                     Expanded(
                                       flex: 2,
                                       child: Text(
@@ -484,7 +544,7 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
                                         ),
                                       ),
                                     ),
-                                    // Cantidad
+                                    // Aqui ponemos la Cantidad
                                     Expanded(
                                       flex: 2,
                                       child: Text(
@@ -495,18 +555,18 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
                                         ),
                                       ),
                                     ),
-                                    // Calidad
+                                    // Aqui ponemos el Rancho
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        produccion['calidad_leche']?.toString() ?? '',
+                                        produccion['rancho_asig']?.toString() ?? '',
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(
                                           fontSize: 11,
                                         ),
                                       ),
                                     ),
-                                    // Persona a cargo
+                                    // Aqui ponemos el Trabajador 
                                     Expanded(
                                       flex: 2,
                                       child: Text(
@@ -517,7 +577,7 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
                                         ),
                                       ),
                                     ),
-                                    // Observaciones
+                                    // Aqui ponemos las Observaciones
                                     Expanded(
                                       flex: 3,
                                       child: Text(
@@ -572,7 +632,7 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Número de arete
+                    // Aqui ponemos el Número de arete
                     TextFormField(
                       controller: _numeroAreteController,
                       decoration: InputDecoration(
@@ -586,7 +646,7 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
                     ),
                     const SizedBox(height: 15),
 
-                    // Fecha de ordeño
+                    // Aqui ponemos la Fecha de ordeño
                     TextFormField(
                       controller: _fechaController,
                       readOnly: true,
@@ -606,7 +666,7 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
                     ),
                     const SizedBox(height: 15),
 
-                    // Cantidad de leche
+                    // Aqui ponemos la Cantidad de leche
                     TextFormField(
                       controller: _cantidadController,
                       decoration: InputDecoration(
@@ -621,35 +681,69 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
                     ),
                     const SizedBox(height: 15),
 
-                    // Calidad de leche
-                    TextFormField(
-                      controller: _calidadController,
+                    // Aqui ponemos el Rancho 
+                    DropdownButtonFormField<String>(
+                      value: _selectedRancho,
                       decoration: InputDecoration(
-                        labelText: 'Calidad de leche',
+                        labelText: 'Rancho',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
                         filled: true,
                         fillColor: Colors.white,
                       ),
+                      items: _ranchos.map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedRancho = newValue;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor seleccione un rancho';
+                        }
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 15),
 
-                    // Persona a cargo
-                    TextFormField(
-                      controller: _personaController,
+                    // Aqui ponemos el Trabajador 
+                    DropdownButtonFormField<String>(
+                      value: _selectedTrabajador,
                       decoration: InputDecoration(
-                        labelText: 'Persona a cargo',
+                        labelText: 'Trabajador',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
                         filled: true,
                         fillColor: Colors.white,
                       ),
+                      items: _trabajadores.map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedTrabajador = newValue;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor seleccione un trabajador';
+                        }
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 15),
 
-                    // Observaciones
+                    // Aqui ponemos las Observaciones
                     TextFormField(
                       controller: _observacionesController,
                       decoration: InputDecoration(
@@ -664,8 +758,6 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
                       maxLines: 3,
                     ),
                     const SizedBox(height: 25),
-
-                    // Botones
                     Wrap(
                       spacing: 10,
                       runSpacing: 10,
@@ -741,8 +833,6 @@ class _ProducciondelechePageState extends State<ProducciondelechePage> {
     _numeroAreteController.dispose();
     _fechaController.dispose();
     _cantidadController.dispose();
-    _calidadController.dispose();
-    _personaController.dispose();
     _observacionesController.dispose();
     super.dispose();
   }

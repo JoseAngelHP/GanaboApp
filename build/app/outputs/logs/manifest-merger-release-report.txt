@@ -1,7 +1,7 @@
 -- Merging decision tree log ---
 application
-INJECTED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:6:5-38:19
-INJECTED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:6:5-38:19
+INJECTED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:6:5-39:19
+INJECTED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:6:5-39:19
 MERGED from [:geolocator_android] C:\xampp\htdocs\GanaboApp\build\geolocator_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:7:5-13:19
 MERGED from [:geolocator_android] C:\xampp\htdocs\GanaboApp\build\geolocator_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:7:5-13:19
 MERGED from [com.google.android.gms:play-services-location:21.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\bc40bc5f6e40c88241fb805931d29c4c\transformed\jetified-play-services-location-21.2.0\AndroidManifest.xml:7:5-20
@@ -44,16 +44,18 @@ MERGED from [com.google.maps.android:android-maps-utils:3.6.0] C:\Users\hiler\.g
 		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:7:9-31
 	android:icon
 		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:9:9-45
+	android:networkSecurityConfig
+		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:10:9-69
 	android:usesCleartextTraffic
-		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:10:9-44
+		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:11:9-44
 	android:name
 		INJECTED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml
 		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:8:9-42
 manifest
-ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:1:1-54:12
-INJECTED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:1:1-54:12
-INJECTED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:1:1-54:12
-INJECTED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:1:1-54:12
+ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:1:1-55:12
+INJECTED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:1:1-55:12
+INJECTED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:1:1-55:12
+INJECTED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:1:1-55:12
 MERGED from [:shared_preferences_android] C:\xampp\htdocs\GanaboApp\build\shared_preferences_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:2:1-7:12
 MERGED from [:geolocator_android] C:\xampp\htdocs\GanaboApp\build\geolocator_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:2:1-15:12
 MERGED from [com.google.android.gms:play-services-location:21.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\bc40bc5f6e40c88241fb805931d29c4c\transformed\jetified-play-services-location-21.2.0\AndroidManifest.xml:2:1-9:12
@@ -154,67 +156,67 @@ ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:5:
 	android:name
 		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:5:22-79
 queries
-ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:44:5-53:15
+ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:45:5-54:15
 MERGED from [com.google.android.gms:play-services-maps:19.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\0af2163ca8a254cebc342e25b97d766e\transformed\jetified-play-services-maps-19.2.0\AndroidManifest.xml:27:5-30:15
 MERGED from [com.google.android.gms:play-services-maps:19.2.0] C:\Users\hiler\.gradle\caches\8.10.2\transforms\0af2163ca8a254cebc342e25b97d766e\transformed\jetified-play-services-maps-19.2.0\AndroidManifest.xml:27:5-30:15
 intent#action:name:android.intent.action.PROCESS_TEXT+data:mimeType:text/plain
-ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:45:9-48:18
+ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:46:9-49:18
 action#android.intent.action.PROCESS_TEXT
-ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:46:13-72
+ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:47:13-72
 	android:name
-		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:46:21-70
+		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:47:21-70
 data
-ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:47:13-50
+ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:48:13-50
 	android:scheme
-		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:51:19-41
+		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:52:19-41
 	android:mimeType
-		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:47:19-48
+		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:48:19-48
 intent#action:name:android.intent.action.VIEW+data:scheme:https
-ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:49:9-52:18
+ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:50:9-53:18
 action#android.intent.action.VIEW
-ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:50:13-65
+ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:51:13-65
 	android:name
-		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:50:21-62
+		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:51:21-62
 activity#com.example.ganabo.MainActivity
-ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:11:9-32:20
+ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:12:9-33:20
 	android:launchMode
-		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:14:13-43
+		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:15:13-43
 	android:hardwareAccelerated
-		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:18:13-47
+		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:19:13-47
 	android:windowSoftInputMode
-		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:19:13-55
+		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:20:13-55
 	android:exported
-		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:13:13-36
+		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:14:13-36
 	android:configChanges
-		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:17:13-163
+		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:18:13-163
 	android:theme
-		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:16:13-47
+		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:17:13-47
 	android:taskAffinity
-		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:15:13-36
+		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:16:13-36
 	android:name
-		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:12:13-41
+		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:13:13-41
 meta-data#io.flutter.embedding.android.NormalTheme
-ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:24:13-27:17
+ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:25:13-28:17
 	android:resource
-		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:26:15-52
+		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:27:15-52
 	android:name
-		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:25:15-70
+		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:26:15-70
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:28:13-31:29
+ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:29:13-32:29
 action#android.intent.action.MAIN
-ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:29:17-68
+ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:30:17-68
 	android:name
-		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:29:25-66
+		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:30:25-66
 category#android.intent.category.LAUNCHER
-ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:30:17-76
+ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:31:17-76
 	android:name
-		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:30:27-74
+		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:31:27-74
 meta-data#flutterEmbedding
-ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:35:9-37:33
+ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:36:9-38:33
 	android:value
-		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:37:13-30
+		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:38:13-30
 	android:name
-		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:36:13-44
+		ADDED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml:37:13-44
 uses-sdk
 INJECTED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from C:\xampp\htdocs\GanaboApp\android\app\src\main\AndroidManifest.xml
