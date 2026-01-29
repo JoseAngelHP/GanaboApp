@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter/foundation.dart'; 
+import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 
 String getApiUrl(String endpoint) {
   if (kIsWeb) {
     return 'https://ganabovino.atwebpages.com/api/$endpoint.php';
-  }
-  else {
+  } else {
     return 'http://ganabovino.atwebpages.com/api/$endpoint.php';
   }
 }
@@ -604,7 +603,8 @@ class _EngordaPageState extends State<EngordaPage> {
 class TablaEngordaScreen extends StatelessWidget {
   final List<Map<String, dynamic>> animales;
 
-  const TablaEngordaScreen({Key? key, required this.animales}) : super(key: key);
+  const TablaEngordaScreen({Key? key, required this.animales})
+    : super(key: key);
 
   String _formatearFechaParaMostrar(String fecha) {
     if (fecha.isEmpty || fecha == '0000-00-00') return '';
@@ -642,13 +642,21 @@ class TablaEngordaScreen extends StatelessWidget {
     if (valorPeso == null) return 'N/A';
 
     try {
+      // Convertimos a double el valor
+      double peso;
       if (valorPeso is String) {
-        final peso = double.tryParse(valorPeso) ?? 0.0;
-        return peso.toStringAsFixed(1);
+        peso = double.tryParse(valorPeso) ?? 0.0;
       } else if (valorPeso is num) {
-        return valorPeso.toStringAsFixed(1);
+        peso = valorPeso.toDouble();
       } else {
         return 'N/A';
+      }
+
+      // verificamos si el número es entero
+      if (peso % 1 == 0) {
+        return peso.toInt().toString(); 
+      } else {
+        return peso.toStringAsFixed(1);
       }
     } catch (e) {
       return 'N/A';
@@ -677,10 +685,7 @@ class TablaEngordaScreen extends StatelessWidget {
                 color: Colors.blueGrey[800],
                 borderRadius: BorderRadius.circular(5),
               ),
-              padding: const EdgeInsets.symmetric(
-                vertical: 15,
-                horizontal: 8,
-              ),
+              padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 8),
               child: const Row(
                 children: [
                   Expanded(
@@ -798,143 +803,128 @@ class TablaEngordaScreen extends StatelessWidget {
 
             // Aqui agregamos el contenido de la tabla
             Expanded(
-              child: animales.isEmpty
-                  ? Center(
-                      child: Text(
-                        'No hay animales registrados',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey[600],
+              child:
+                  animales.isEmpty
+                      ? Center(
+                        child: Text(
+                          'No hay animales registrados',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey[600],
+                          ),
                         ),
-                      ),
-                    )
-                  : ListView.builder(
-                      itemCount: animales.length,
-                      itemBuilder: (context, index) {
-                        final animal = animales[index];
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: index.isEven ? Colors.grey[50] : Colors.white,
-                            border: Border(
-                              bottom: BorderSide(
-                                color: Colors.grey[300]!,
+                      )
+                      : ListView.builder(
+                        itemCount: animales.length,
+                        itemBuilder: (context, index) {
+                          final animal = animales[index];
+                          return Container(
+                            decoration: BoxDecoration(
+                              color:
+                                  index.isEven ? Colors.grey[50] : Colors.white,
+                              border: Border(
+                                bottom: BorderSide(color: Colors.grey[300]!),
                               ),
                             ),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 12,
-                            horizontal: 8,
-                          ),
-                          child: Row(
-                            children: [
-                              // Ponemos el N° Arete
-                              Expanded(
-                                flex: 2,
-                                child: Text(
-                                  animal['numero_arete']?.toString() ?? 'N/A',
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 11,
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 12,
+                              horizontal: 8,
+                            ),
+                            child: Row(
+                              children: [
+                                // Ponemos el N° Arete
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    animal['numero_arete']?.toString() ?? 'N/A',
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(fontSize: 11),
                                   ),
                                 ),
-                              ),
-                              // Ponemos la Fecha de Ingreso
-                              Expanded(
-                                flex: 2,
-                                child: Text(
-                                  _formatearFechaParaMostrar(
-                                    animal['fecha_ingreso']?.toString() ?? '',
-                                  ),
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 11,
+                                // Ponemos la Fecha de Ingreso
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    _formatearFechaParaMostrar(
+                                      animal['fecha_ingreso']?.toString() ?? '',
+                                    ),
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(fontSize: 11),
                                   ),
                                 ),
-                              ),
-                              // Ponemos el Peso de Ingreso
-                              Expanded(
-                                flex: 2,
-                                child: Text(
-                                  _formatearPeso(animal['peso_ingreso']),
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 11,
+                                // Ponemos el Peso de Ingreso
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    _formatearPeso(animal['peso_ingreso']),
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(fontSize: 11),
                                   ),
                                 ),
-                              ),
-                              // Ponemos el Costo
-                              Expanded(
-                                flex: 2,
-                                child: Text(
-                                  _formatearCosto(animal['costo_adquisicion']),
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 11,
+                                // Ponemos el Costo
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    _formatearCosto(
+                                      animal['costo_adquisicion'],
+                                    ),
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(fontSize: 11),
                                   ),
                                 ),
-                              ),
-                              // Ponemos el Grupo
-                              Expanded(
-                                flex: 2,
-                                child: Text(
-                                  animal['grupo_engorda']?.toString() ?? 'N/A',
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 11,
+                                // Ponemos el Grupo
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    animal['grupo_engorda']?.toString() ??
+                                        'N/A',
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(fontSize: 11),
                                   ),
                                 ),
-                              ),
-                              // Ponemos la Dieta
-                              Expanded(
-                                flex: 2,
-                                child: Text(
-                                  animal['dieta']?.toString() ?? 'N/A',
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 11,
+                                // Ponemos la Dieta
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    animal['dieta']?.toString() ?? 'N/A',
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(fontSize: 11),
                                   ),
                                 ),
-                              ),
-                              // Ponemos la Ganancia
-                              Expanded(
-                                flex: 2,
-                                child: Text(
-                                  _formatearPeso(animal['ganancia_peso']),
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 11,
+                                // Ponemos la Ganancia
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    _formatearPeso(animal['ganancia_peso']),
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(fontSize: 11),
                                   ),
                                 ),
-                              ),
-                              // Ponemos la Fecha de Salida
-                              Expanded(
-                                flex: 2,
-                                child: Text(
-                                  _formatearFechaParaMostrar(
-                                    animal['fecha_salida']?.toString() ?? '',
-                                  ),
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 11,
+                                // Ponemos la Fecha de Salida
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    _formatearFechaParaMostrar(
+                                      animal['fecha_salida']?.toString() ?? '',
+                                    ),
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(fontSize: 11),
                                   ),
                                 ),
-                              ),
-                              // Ponemos el Peso de Salida
-                              Expanded(
-                                flex: 2,
-                                child: Text(
-                                  _formatearPeso(animal['peso_salida']),
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 11,
+                                // Ponemos el Peso de Salida
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    _formatearPeso(animal['peso_salida']),
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(fontSize: 11),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
             ),
           ],
         ),

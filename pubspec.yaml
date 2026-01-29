@@ -32,7 +32,7 @@ flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
   image_path: "Icons/logo_inicio.png"
-  min_sdk_android: 21 # android min sdk min:16, default 21
+  min_sdk_android: 21 
   web:
     generate: true
     image_path: "Icons/logo_inicio.png"
@@ -41,7 +41,7 @@ flutter_launcher_icons:
   windows:
     generate: true
     image_path: "Icons/logo_inicio.png"
-    icon_size: 48 # min:48, max:256, default: 48
+    icon_size: 48 
   macos:
     generate: true
     image_path: "Icons/logo_inicio.png"

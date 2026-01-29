@@ -4,29 +4,24 @@ import 'package:url_launcher/url_launcher.dart';
 class ContactosPage extends StatelessWidget {
   const ContactosPage({Key? key}) : super(key: key);
 
-  // Aqui agregamos una función para abrir enlaces
   Future<void> _launchURL(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'No se pudo abrir $url';
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
     }
   }
 
-  // Aqui agregamos una función para abrir nuestro correo electrónico
   Future<void> _launchEmail() async {
-    final Uri params = Uri(
+    // Aqui agregamos el texto para el correo
+    final Uri emailUri = Uri(
       scheme: 'mailto',
       path: 'ganabodemo@gmail.com',
-      query: 'subject=Consulta&body=Hola, me gustaría obtener más información', // Mensaje predeterminado
+      query: 'subject=Consulta&body=Hola, me gustaría obtener más información',
     );
-
-    String url = params.toString();
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'No se pudo abrir el cliente de correo';
-    }
+    
+    // Abrimos de forma directa
+    await launchUrl(emailUri);
+    
   }
 
   @override
@@ -53,35 +48,33 @@ class ContactosPage extends StatelessWidget {
             ),
             const SizedBox(height: 30),
             
-            // Aqui agregamos la tarjeta para que nos mande a gmail
             Card(
               elevation: 4,
               margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               child: ListTile(
-                leading: Icon(Icons.email, color: Colors.red, size: 30), // Ponemos el icono de correo
+                leading: Icon(Icons.email, color: Colors.red, size: 30),
                 title: const Text(
                   "Gmail",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 subtitle: const Text("ganabodemo@gmail.com"),
                 trailing: const Icon(Icons.arrow_forward_ios),
-                onTap: () => _launchEmail(), // Redirecciona al usuario de correo
+                onTap: _launchEmail,
               ),
             ),
             
-            // Aqui ponemos la tarjeta para whatsapp
             Card(
               elevation: 4,
               margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               child: ListTile(
-                leading: Icon(Icons.chat, color: Colors.green, size: 30), // Ponemos el icono de mensajes
+                leading: Icon(Icons.chat, color: Colors.green, size: 30),
                 title: const Text(
                   "WhatsApp",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 subtitle: const Text("Grupo de la comunidad"),
                 trailing: const Icon(Icons.arrow_forward_ios),
-                onTap: () => _launchURL('https://chat.whatsapp.com/JVjWugehqta5W7ELwbYHLF'), // Aqui abre el grupo de whatsapp
+                onTap: () => _launchURL('https://chat.whatsapp.com/JVjWugehqta5W7ELwbYHLF'),
               ),
             ),
             
